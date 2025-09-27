@@ -101,6 +101,71 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          booking_status: string
+          check_in_date: string
+          check_out_date: string
+          created_at: string
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          guests_count: number
+          id: string
+          payment_method: string
+          payment_status: string
+          room_id: string
+          special_requests: string | null
+          total_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_status?: string
+          check_in_date: string
+          check_out_date: string
+          created_at?: string
+          guest_email: string
+          guest_name: string
+          guest_phone: string
+          guests_count: number
+          id?: string
+          payment_method: string
+          payment_status?: string
+          room_id: string
+          special_requests?: string | null
+          total_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_status?: string
+          check_in_date?: string
+          check_out_date?: string
+          created_at?: string
+          guest_email?: string
+          guest_name?: string
+          guest_phone?: string
+          guests_count?: number
+          id?: string
+          payment_method?: string
+          payment_status?: string
+          room_id?: string
+          special_requests?: string | null
+          total_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       criteria: {
         Row: {
           bobot: number
@@ -198,6 +263,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rooms: {
+        Row: {
+          amenities: string[] | null
+          capacity: number
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          is_available: boolean
+          name: string
+          price_per_night: number
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          amenities?: string[] | null
+          capacity: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_available?: boolean
+          name: string
+          price_per_night: number
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          amenities?: string[] | null
+          capacity?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          is_available?: boolean
+          name?: string
+          price_per_night?: number
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       students: {
         Row: {

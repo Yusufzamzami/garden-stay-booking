@@ -15,8 +15,13 @@ const SearchForm = () => {
   });
 
   const handleSearch = () => {
-    console.log("Search data:", searchData);
-    // Here you would typically handle the search logic
+    const params = new URLSearchParams({
+      checkIn: searchData.checkIn,
+      checkOut: searchData.checkOut,
+      guests: searchData.guests,
+      roomType: searchData.roomType || 'any'
+    });
+    window.location.href = `/rooms?${params.toString()}`;
   };
 
   return (

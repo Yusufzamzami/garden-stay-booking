@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Users } from "lucide-react";
+import { Search, Calendar, Users, User, Settings } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-room.jpg";
 
 const Hero = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -13,6 +18,31 @@ const Hero = () => {
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+      </div>
+
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-6 lg:p-8">
+        <div className="text-2xl lg:text-3xl font-bold text-white">
+          The Garden Residence
+        </div>
+        <div className="flex gap-3">
+          {user ? (
+            <div className="flex gap-3">
+              <Button variant="hero" size="lg" onClick={() => navigate('/dashboard')}>
+                <Settings className="mr-2 h-5 w-5" />
+                Dashboard
+              </Button>
+              <Button variant="hero" size="lg" onClick={signOut}>
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button variant="hero" size="lg" onClick={() => navigate('/auth')}>
+              <User className="mr-2 h-5 w-5" />
+              Sign In
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Content */}
