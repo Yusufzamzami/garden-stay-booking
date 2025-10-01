@@ -7,14 +7,22 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <Hero />
-      <SearchForm />
-      <RoomShowcase />
-      <Facilities />
-      <Testimonials />
+      <section aria-label="Search and booking">
+        <SearchForm />
+      </section>
+      <section aria-label="Room showcase">
+        <RoomShowcase />
+      </section>
+      <section aria-label="Hotel facilities">
+        <Facilities />
+      </section>
+      <section aria-label="Guest testimonials">
+        <Testimonials />
+      </section>
       <Footer />
-    </div>
+    </main>
   );
 };
 

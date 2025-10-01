@@ -9,6 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, CreditCard, User, Phone, Mail } from 'lucide-react';
+import { z } from 'zod';
+
+const bookingSchema = z.object({
+  guestName: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+  guestEmail: z.string().trim().email('Invalid email address').max(255, 'Email too long'),
+  guestPhone: z.string().trim().min(8, 'Phone number must be at least 8 digits').max(20, 'Phone number too long'),
+  specialRequests: z.string().max(1000, 'Special requests must be less than 1000 characters').optional(),
+});
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -47,6 +55,18 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
       toast({
         title: "Authentication Required",
         description: "Please log in to make a booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate input data
+    const validationResult = bookingSchema.safeParse(bookingData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
@@ -156,6 +176,8 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                     id="guest-name"
                     value={bookingData.guestName}
                     onChange={(e) => setBookingData({...bookingData, guestName: e.target.value})}
+                    placeholder="Enter your full name"
+                    maxLength={100}
                     required
                   />
                 </div>
@@ -170,6 +192,8 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                     type="email"
                     value={bookingData.guestEmail}
                     onChange={(e) => setBookingData({...bookingData, guestEmail: e.target.value})}
+                    placeholder="your.email@example.com"
+                    maxLength={255}
                     required
                   />
                 </div>
@@ -181,8 +205,11 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   </Label>
                   <Input
                     id="guest-phone"
+                    type="tel"
                     value={bookingData.guestPhone}
                     onChange={(e) => setBookingData({...bookingData, guestPhone: e.target.value})}
+                    placeholder="+62 812 3456 7890"
+                    maxLength={20}
                     required
                   />
                 </div>
@@ -213,6 +240,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   placeholder="Any special requests or requirements..."
                   value={bookingData.specialRequests}
                   onChange={(e) => setBookingData({...bookingData, specialRequests: e.target.value})}
+                  maxLength={1000}
                   rows={3}
                 />
               </div>

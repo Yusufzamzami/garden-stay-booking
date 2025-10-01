@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.string().trim().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const signupSchema = z.object({
+  email: z.string().trim().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  fullName: z.string().trim().min(2, 'Name must be at least 2 characters').max(100),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -29,10 +52,23 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate input
+    const validationResult = loginSchema.safeParse(loginData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast({
+        title: "Validation Error",
+        description: firstError.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(loginData.email, loginData.password);
+      const { error } = await signIn(loginData.email.trim(), loginData.password);
       
       if (error) {
         toast({
@@ -60,11 +96,14 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (signupData.password !== signupData.confirmPassword) {
+
+    // Validate input
+    const validationResult = signupSchema.safeParse(signupData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
       toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match.",
+        title: "Validation Error",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
@@ -73,7 +112,11 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await signUp(signupData.email, signupData.password, signupData.fullName);
+      const { error } = await signUp(
+        signupData.email.trim(), 
+        signupData.password, 
+        signupData.fullName.trim()
+      );
       
       if (error) {
         toast({
@@ -137,6 +180,8 @@ const Auth = () => {
                       placeholder="Enter your email"
                       value={loginData.email}
                       onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                      maxLength={255}
+                      autoComplete="email"
                       required
                     />
                   </div>
@@ -148,6 +193,8 @@ const Auth = () => {
                       placeholder="Enter your password"
                       value={loginData.password}
                       onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                      autoComplete="current-password"
+                      minLength={6}
                       required
                     />
                   </div>
@@ -167,6 +214,8 @@ const Auth = () => {
                       placeholder="Enter your full name"
                       value={signupData.fullName}
                       onChange={(e) => setSignupData({...signupData, fullName: e.target.value})}
+                      maxLength={100}
+                      autoComplete="name"
                       required
                     />
                   </div>
@@ -178,6 +227,8 @@ const Auth = () => {
                       placeholder="Enter your email"
                       value={signupData.email}
                       onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+                      maxLength={255}
+                      autoComplete="email"
                       required
                     />
                   </div>
@@ -186,9 +237,11 @@ const Auth = () => {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a password (min. 6 characters)"
                       value={signupData.password}
                       onChange={(e) => setSignupData({...signupData, password: e.target.value})}
+                      autoComplete="new-password"
+                      minLength={6}
                       required
                     />
                   </div>
@@ -200,6 +253,8 @@ const Auth = () => {
                       placeholder="Confirm your password"
                       value={signupData.confirmPassword}
                       onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
+                      autoComplete="new-password"
+                      minLength={6}
                       required
                     />
                   </div>
