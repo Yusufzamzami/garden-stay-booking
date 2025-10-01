@@ -21,29 +21,45 @@ const Hero = () => {
       </div>
 
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-6 lg:p-8">
-        <div className="text-2xl lg:text-3xl font-bold text-white">
+      <header className="absolute top-0 left-0 right-0 z-10 flex justify-between items-center p-4 sm:p-6 lg:p-8 gap-2">
+        <h2 className="text-base sm:text-xl lg:text-3xl font-bold text-white truncate flex-shrink min-w-0">
           The Garden Residence
-        </div>
-        <div className="flex gap-3">
+        </h2>
+        <nav className="flex gap-2 sm:gap-3 flex-shrink-0">
           {user ? (
-            <div className="flex gap-3">
-              <Button variant="hero" size="lg" onClick={() => navigate('/dashboard')}>
-                <Settings className="mr-2 h-5 w-5" />
-                Dashboard
+            <>
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="text-xs sm:text-sm lg:text-base px-2 sm:px-4 lg:px-8 h-8 sm:h-10 lg:h-11" 
+                onClick={() => navigate('/dashboard')}
+              >
+                <Settings className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Dashboard</span>
               </Button>
-              <Button variant="hero" size="lg" onClick={signOut}>
-                Sign Out
+              <Button 
+                variant="hero" 
+                size="sm" 
+                className="text-xs sm:text-sm lg:text-base px-2 sm:px-4 lg:px-8 h-8 sm:h-10 lg:h-11" 
+                onClick={signOut}
+              >
+                <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden">Out</span>
               </Button>
-            </div>
+            </>
           ) : (
-            <Button variant="hero" size="lg" onClick={() => navigate('/auth')}>
-              <User className="mr-2 h-5 w-5" />
-              Sign In
+            <Button 
+              variant="hero" 
+              size="sm" 
+              className="text-xs sm:text-sm lg:text-base px-3 sm:px-6 lg:px-8 h-8 sm:h-10 lg:h-11" 
+              onClick={() => navigate('/auth')}
+            >
+              <User className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5 sm:mr-2" />
+              <span className="hidden sm:inline">Sign In</span>
             </Button>
           )}
-        </div>
-      </div>
+        </nav>
+      </header>
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
