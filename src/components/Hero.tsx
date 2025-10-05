@@ -64,42 +64,50 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight animate-fade-in">
             The Garden
-            <span className="block bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent mt-1 sm:mt-2">
               Residence
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 leading-relaxed px-2 sm:px-0 animate-fade-in">
             Experience luxury and tranquility in our garden paradise. 
             Where elegance meets nature's embrace.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button variant="hero" size="lg" className="text-lg px-8 py-4">
-              <Search className="mr-2 h-5 w-5" />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4 sm:px-0">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto hover-scale"
+            >
+              <Search className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Book Your Stay
             </Button>
-            <Button variant="elegant" size="lg" className="text-lg px-8 py-4">
-              <Calendar className="mr-2 h-5 w-5" />
+            <Button 
+              variant="elegant" 
+              size="lg" 
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto hover-scale"
+            >
+              <Calendar className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               View Rooms
             </Button>
           </div>
 
           {/* Quick Stats */}
-          <div className="flex justify-center space-x-8 text-white/80">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gold">50+</div>
-              <div className="text-sm">Luxury Rooms</div>
+          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-md sm:max-w-none mx-auto px-2 text-white/80">
+            <div className="text-center transform transition-transform hover:scale-110">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gold mb-1">50+</div>
+              <div className="text-xs sm:text-sm md:text-base">Luxury Rooms</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gold">24/7</div>
-              <div className="text-sm">Concierge</div>
+            <div className="text-center transform transition-transform hover:scale-110">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gold mb-1">24/7</div>
+              <div className="text-xs sm:text-sm md:text-base">Concierge</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-gold">5★</div>
-              <div className="text-sm">Service</div>
+            <div className="text-center transform transition-transform hover:scale-110">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gold mb-1">5★</div>
+              <div className="text-xs sm:text-sm md:text-base">Service</div>
             </div>
           </div>
         </div>
