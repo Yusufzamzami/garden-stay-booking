@@ -1,10 +1,11 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Calendar, Users, User, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-room.jpg";
 
-const Hero = () => {
+const Hero = memo(() => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   
@@ -15,6 +16,7 @@ const Hero = () => {
         <img 
           src={heroImage} 
           alt="Luxury hotel room at The Garden Residence"
+          loading="lazy"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
@@ -121,6 +123,8 @@ const Hero = () => {
       </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;

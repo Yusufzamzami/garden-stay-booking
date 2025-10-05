@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +58,7 @@ const rooms = [
   }
 ];
 
-const RoomShowcase = () => {
+const RoomShowcase = memo(() => {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -86,6 +87,7 @@ const RoomShowcase = () => {
                 <img 
                   src={room.image} 
                   alt={room.name}
+                  loading="lazy"
                   className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute top-4 left-4">
@@ -143,6 +145,8 @@ const RoomShowcase = () => {
       </div>
     </section>
   );
-};
+});
+
+RoomShowcase.displayName = 'RoomShowcase';
 
 export default RoomShowcase;
