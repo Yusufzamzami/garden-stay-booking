@@ -29,13 +29,13 @@ const Rooms = () => {
   const fetchRooms = async () => {
     try {
       let query = supabase.from('rooms').select('*').eq('is_available', true);
-      
+
       if (roomType && roomType !== 'any') {
         query = query.eq('type', roomType);
       }
-      
+
       const { data, error } = await query.order('price_per_night', { ascending: true });
-      
+
       if (error) throw error;
       setRooms(data || []);
     } catch (error) {
@@ -84,7 +84,7 @@ const Rooms = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Button>
-          
+
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-foreground">Available Rooms</h1>
             {checkIn && checkOut && (
@@ -106,11 +106,14 @@ const Rooms = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {rooms.map((room) => (
-              <Card key={room.id} className="overflow-hidden shadow-elegant hover:shadow-lg transition-shadow">
+              <Card
+                key={room.id}
+                className="overflow-hidden shadow-elegant hover:shadow-lg transition-shadow"
+              >
                 <div className="aspect-video bg-gradient-to-br from-primary-soft/20 to-primary-soft/10 flex items-center justify-center">
                   <div className="text-6xl opacity-20">🏨</div>
                 </div>
-                
+
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
@@ -126,29 +129,30 @@ const Rooms = () => {
                         {new Intl.NumberFormat('id-ID', {
                           style: 'currency',
                           currency: 'IDR',
-                          minimumFractionDigits: 3
+                          minimumFractionDigits: 0,
                         }).format(room.price_per_night)}
                       </div>
                       <div className="text-sm text-muted-foreground">per night</div>
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent>
-                  <p className="text-muted-foreground mb-4 line-clamp-2">
-                    {room.description}
-                  </p>
-                  
+                  <p className="text-muted-foreground mb-4 line-clamp-2">{room.description}</p>
+
                   <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
                     <Users className="h-4 w-4" />
                     <span>Up to {room.capacity} guests</span>
                   </div>
-                  
+
                   <div className="space-y-2 mb-6">
                     <p className="text-sm font-medium text-foreground">Amenities:</p>
                     <div className="flex flex-wrap gap-2">
                       {room.amenities?.slice(0, 3).map((amenity: string, index: number) => (
-                        <div key={index} className="flex items-center gap-1 text-xs text-muted-foreground bg-primary-soft/10 px-2 py-1 rounded-full">
+                        <div
+                          key={index}
+                          className="flex items-center gap-1 text-xs text-muted-foreground bg-primary-soft/10 px-2 py-1 rounded-full"
+                        >
                           {getAmenityIcon(amenity)}
                           <span>{amenity}</span>
                         </div>
@@ -160,8 +164,8 @@ const Rooms = () => {
                       )}
                     </div>
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     onClick={() => handleBookRoom(room)}
                     className="w-full"
                     disabled={room.capacity < guests}

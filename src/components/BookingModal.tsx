@@ -31,7 +31,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [bookingData, setBookingData] = useState({
     guestName: '',
     guestEmail: '',
@@ -50,7 +50,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -60,7 +60,6 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
       return;
     }
 
-    // Validate input data
     const validationResult = bookingSchema.safeParse(bookingData);
     if (!validationResult.success) {
       const firstError = validationResult.error.errors[0];
@@ -87,19 +86,17 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
         total_price: totalPrice,
         payment_method: bookingData.paymentMethod,
         special_requests: bookingData.specialRequests,
-        payment_status: 'completed', // Simulated payment success
+        payment_status: 'completed',
         booking_status: 'confirmed',
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Booking Confirmed!",
         description: `Your reservation for ${room.name} has been confirmed.`,
       });
-      
+
       onClose();
       setBookingData({
         guestName: '',
@@ -134,16 +131,15 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
 
         {room && (
           <div className="space-y-6">
-            {/* Booking Summary */}
             <div className="bg-primary-soft/10 p-4 rounded-lg">
               <h3 className="font-semibold text-foreground mb-2">Ringkasan Pemesanan</h3>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex justify-between">
-                  <span>Room:</span>
+                  <span>Kamar:</span>
                   <span className="font-medium">{room.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Lapor masuk:</span>
+                  <span>Check-in:</span>
                   <span>{new Date(checkIn).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
@@ -159,19 +155,18 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   <span>{guests}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-foreground border-t pt-2">
-                <span>Harga Total:</span>
-                <span>
-                {new Intl.NumberFormat('id-ID', {
-                style: 'currency',
-                 currency: 'IDR',
-                minimumFractionDigits: 0
-                  })
-                 .format(totalPrice * 1000)
-                  .replace(/\s/g, '')} 
-                </span>
+                  <span>Harga Total:</span>
+                  <span>
+                    {new Intl.NumberFormat('id-ID', {
+                      style: 'currency',
+                      currency: 'IDR',
+                      minimumFractionDigits: 0,
+                    }).format(totalPrice)}
+                  </span>
                 </div>
               </div>
             </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -182,8 +177,8 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   <Input
                     id="guest-name"
                     value={bookingData.guestName}
-                    onChange={(e) => setBookingData({...bookingData, guestName: e.target.value})}
-                    placeholder="Enter your full name"
+                    onChange={(e) => setBookingData({ ...bookingData, guestName: e.target.value })}
+                    placeholder="Masukkan nama lengkap Anda"
                     maxLength={100}
                     required
                   />
@@ -192,14 +187,14 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                 <div className="space-y-2">
                   <Label htmlFor="guest-email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-primary" />
-                    Email Address
+                    Alamat Email
                   </Label>
                   <Input
                     id="guest-email"
                     type="email"
                     value={bookingData.guestEmail}
-                    onChange={(e) => setBookingData({...bookingData, guestEmail: e.target.value})}
-                    placeholder="your.email@example.com"
+                    onChange={(e) => setBookingData({ ...bookingData, guestEmail: e.target.value })}
+                    placeholder="emailanda@example.com"
                     maxLength={255}
                     required
                   />
@@ -208,13 +203,13 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                 <div className="space-y-2">
                   <Label htmlFor="guest-phone" className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-primary" />
-                    Phone Number
+                    Nomor Telepon
                   </Label>
                   <Input
                     id="guest-phone"
                     type="tel"
                     value={bookingData.guestPhone}
-                    onChange={(e) => setBookingData({...bookingData, guestPhone: e.target.value})}
+                    onChange={(e) => setBookingData({ ...bookingData, guestPhone: e.target.value })}
                     placeholder="+62 812 3456 7890"
                     maxLength={20}
                     required
@@ -226,27 +221,30 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                     <CreditCard className="h-4 w-4 text-primary" />
                     Metode Pembayaran
                   </Label>
-                  <Select value={bookingData.paymentMethod} onValueChange={(value) => setBookingData({...bookingData, paymentMethod: value})}>
+                  <Select
+                    value={bookingData.paymentMethod}
+                    onValueChange={(value) => setBookingData({ ...bookingData, paymentMethod: value })}
+                  >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Pilih metode pembayaran" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="credit_card">Credit Card</SelectItem>
-                      <SelectItem value="debit_card">Debit Card</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                      <SelectItem value="cash">Cash on Arrival</SelectItem>
+                      <SelectItem value="credit_card">Kartu Kredit</SelectItem>
+                      <SelectItem value="debit_card">Kartu Debit</SelectItem>
+                      <SelectItem value="bank_transfer">Transfer Bank</SelectItem>
+                      <SelectItem value="cash">Bayar di Tempat</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="special-requests">Special Requests (Optional)</Label>
+                <Label htmlFor="special-requests">Permintaan Khusus (Opsional)</Label>
                 <Textarea
                   id="special-requests"
-                  placeholder="Any special requests or requirements..."
+                  placeholder="Tuliskan permintaan khusus atau kebutuhan tambahan..."
                   value={bookingData.specialRequests}
-                  onChange={(e) => setBookingData({...bookingData, specialRequests: e.target.value})}
+                  onChange={(e) => setBookingData({ ...bookingData, specialRequests: e.target.value })}
                   maxLength={1000}
                   rows={3}
                 />
@@ -254,16 +252,16 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
 
               <div className="flex gap-3 pt-4">
                 <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-                  Cancel
+                  Batal
                 </Button>
                 <Button type="submit" disabled={isLoading} className="flex-1">
-                {isLoading
-                ? "Processing..."
-                 : `Konfirmasi Pemesanan - ${new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 0
-                  }).format(totalPrice * 1000)}`}
+                  {isLoading
+                    ? 'Memproses...'
+                    : `Konfirmasi Pemesanan - ${new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                      }).format(totalPrice)}`}
                 </Button>
               </div>
             </form>
