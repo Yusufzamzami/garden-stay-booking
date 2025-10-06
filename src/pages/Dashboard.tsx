@@ -33,42 +33,38 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch bookings
       const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
-        .select(`
-          *,
-          rooms (name, type)
-        `)
+        .select(`*, rooms (name, type)`)
         .order('created_at', { ascending: false });
-
       if (bookingsError) throw bookingsError;
 
-      // Fetch rooms
       const { data: roomsData, error: roomsError } = await supabase
         .from('rooms')
         .select('*')
         .order('type', { ascending: true });
-
       if (roomsError) throw roomsError;
 
       setBookings(bookingsData || []);
       setRooms(roomsData || []);
 
-      // Calculate stats
       const totalBookings = bookingsData?.length || 0;
-      const totalRevenue = bookingsData?.reduce((sum, booking) => 
-        sum + (booking.payment_status === 'completed' ? parseFloat(booking.total_price.toString()) : 0), 0) || 0;
-      const availableRooms = roomsData?.filter(room => room.is_available).length || 0;
-      const occupancyRate = roomsData?.length ? 
-        ((roomsData.length - availableRooms) / roomsData.length) * 100 : 0;
+      const totalRevenue =
+        bookingsData?.reduce(
+          (sum, booking) =>
+            sum +
+            (booking.payment_status === 'completed'
+              ? parseFloat(booking.total_price.toString())
+              : 0),
+          0
+        ) || 0;
 
-      setStats({
-        totalBookings,
-        totalRevenue,
-        occupancyRate,
-        availableRooms,
-      });
+      const availableRooms = roomsData?.filter((room) => room.is_available).length || 0;
+      const occupancyRate = roomsData?.length
+        ? ((roomsData.length - availableRooms) / roomsData.length) * 100
+        : 0;
+
+      setStats({ totalBookings, totalRevenue, occupancyRate, availableRooms });
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -78,13 +74,9 @@ const Dashboard = () => {
 
   const updateBookingStatus = async (bookingId: string, status: string) => {
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ booking_status: status })
-        .eq('id', bookingId);
-
+      const { error } = await supabase.from('bookings').update({ booking_status: status }).eq('id', bookingId);
       if (error) throw error;
-      fetchDashboardData(); // Refresh data
+      fetchDashboardData();
     } catch (error) {
       console.error('Error updating booking status:', error);
     }
@@ -92,13 +84,9 @@ const Dashboard = () => {
 
   const toggleRoomAvailability = async (roomId: string, isAvailable: boolean) => {
     try {
-      const { error } = await supabase
-        .from('rooms')
-        .update({ is_available: !isAvailable })
-        .eq('id', roomId);
-
+      const { error } = await supabase.from('rooms').update({ is_available: !isAvailable }).eq('id', roomId);
       if (error) throw error;
-      fetchDashboardData(); // Refresh data
+      fetchDashboardData();
     } catch (error) {
       console.error('Error updating room availability:', error);
     }
@@ -106,56 +94,52 @@ const Dashboard = () => {
 
   const deleteBooking = async (bookingId: string) => {
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', bookingId);
-
+      const { error } = await supabase.from('bookings').delete().eq('id', bookingId);
       if (error) throw error;
-      fetchDashboardData(); // Refresh data
+      fetchDashboardData();
     } catch (error) {
       console.error('Error deleting booking:', error);
     }
   };
 
+  // === EXPORT LAPORAN KEUANGAN CSV ===
   const exportFinancialReportCSV = () => {
     try {
-      // Prepare CSV data
-      const headers = ['Tanggal Booking', 'Nama Tamu', 'Email', 'Telepon', 'Kamar', 'Check-in', 'Check-out', 'Jumlah Tamu', 'Total Harga (IDR)', 'Status Pembayaran', 'Status Booking'];
-      
-      const rows = bookings.map(booking => [
-        new Date(booking.created_at).toLocaleDateString('id-ID'),
-        booking.guest_name,
-        booking.guest_email,
-        booking.guest_phone,
-        booking.rooms?.name || '-',
-        new Date(booking.check_in_date).toLocaleDateString('id-ID'),
-        new Date(booking.check_out_date).toLocaleDateString('id-ID'),
-        booking.guests_count,
-        new Intl.NumberFormat('id-ID').format(booking.total_price),
-        booking.payment_status,
-        booking.booking_status
+      const headers = [
+        'Tanggal Booking',
+        'Nama Tamu',
+        'Email',
+        'Telepon',
+        'Kamar',
+        'Check-in',
+        'Check-out',
+        'Jumlah Tamu',
+        'Total Harga (IDR)',
+        'Status Pembayaran',
+        'Status Booking',
+      ];
+
+      const rows = bookings.map((b) => [
+        new Date(b.created_at).toLocaleDateString('id-ID'),
+        b.guest_name,
+        b.guest_email,
+        b.guest_phone,
+        b.rooms?.name || '-',
+        new Date(b.check_in_date).toLocaleDateString('id-ID'),
+        new Date(b.check_out_date).toLocaleDateString('id-ID'),
+        b.guests_count,
+        new Intl.NumberFormat('id-ID').format(b.total_price),
+        b.payment_status,
+        b.booking_status,
       ]);
 
-      // Create CSV content
-      const csvContent = [
-        headers.join(','),
-        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-      ].join('\n');
-
-      // Create blob and download
+      const csvContent = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n');
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
-      link.setAttribute('href', url);
-      link.setAttribute('download', `Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      
-      document.body.appendChild(link);
+      link.href = url;
+      link.download = `Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.csv`;
       link.click();
-      document.body.removeChild(link);
-      
       toast.success('Laporan CSV berhasil diexport!');
     } catch (error) {
       console.error('Error exporting CSV report:', error);
@@ -163,59 +147,44 @@ const Dashboard = () => {
     }
   };
 
+  // === EXPORT LAPORAN KEUANGAN PDF ===
   const exportFinancialReportPDF = () => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
-      
-      // Header
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
+
+      doc.setFontSize(18).setFont('helvetica', 'bold');
       doc.text('THE GARDEN RESIDENCE', pageWidth / 2, 20, { align: 'center' });
-      
-      doc.setFontSize(14);
-      doc.text('LAPORAN KEUANGAN', pageWidth / 2, 28, { align: 'center' });
-      
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      const reportDate = new Date().toLocaleDateString('id-ID', { 
-        day: 'numeric', 
-        month: 'long', 
-        year: 'numeric' 
-      });
+      doc.setFontSize(14).text('LAPORAN KEUANGAN', pageWidth / 2, 28, { align: 'center' });
+
+      const reportDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+      doc.setFontSize(10).setFont('helvetica', 'normal');
       doc.text(`Tanggal Laporan: ${reportDate}`, pageWidth / 2, 35, { align: 'center' });
-      
-      // Summary Section
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.text('RINGKASAN KEUANGAN', 14, 45);
-      
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      
+
+      doc.setFontSize(12).setFont('helvetica', 'bold').text('RINGKASAN KEUANGAN', 14, 45);
+      doc.setFontSize(10).setFont('helvetica', 'normal');
       const summaryData = [
         ['Total Booking', `: ${stats.totalBookings}`],
         ['Total Pendapatan', `: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.totalRevenue)}`],
         ['Tingkat Okupansi', `: ${stats.occupancyRate.toFixed(1)}%`],
-        ['Kamar Tersedia', `: ${stats.availableRooms}`]
+        ['Kamar Tersedia', `: ${stats.availableRooms}`],
       ];
-      
+
       let yPos = 52;
       summaryData.forEach(([label, value]) => {
         doc.text(label, 14, yPos);
         doc.text(value, 60, yPos);
         yPos += 6;
       });
-      
-      // Table
-      const tableData = bookings.map(booking => [
-        new Date(booking.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-        booking.guest_name,
-        booking.rooms?.name || '-',
-        `${new Date(booking.check_in_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} - ${new Date(booking.check_out_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })}`,
-        booking.guests_count.toString(),
-        new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(booking.total_price),
-        booking.booking_status === 'confirmed' ? 'Confirmed' : 'Cancelled'
+
+      const tableData = bookings.map((b) => [
+        new Date(b.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        b.guest_name,
+        b.rooms?.name || '-',
+        `${new Date(b.check_in_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} - ${new Date(b.check_out_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })}`,
+        b.guests_count.toString(),
+        new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(b.total_price),
+        b.booking_status === 'confirmed' ? 'Confirmed' : 'Cancelled',
       ]);
 
       autoTable(doc, {
@@ -223,16 +192,8 @@ const Dashboard = () => {
         head: [['Tanggal', 'Nama Tamu', 'Kamar', 'Periode', 'Tamu', 'Total', 'Status']],
         body: tableData,
         theme: 'striped',
-        headStyles: {
-          fillColor: [34, 197, 94],
-          textColor: 255,
-          fontStyle: 'bold',
-          halign: 'center'
-        },
-        styles: {
-          fontSize: 9,
-          cellPadding: 3
-        },
+        headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+        styles: { fontSize: 9, cellPadding: 3 },
         columnStyles: {
           0: { halign: 'center', cellWidth: 25 },
           1: { halign: 'left', cellWidth: 35 },
@@ -240,23 +201,15 @@ const Dashboard = () => {
           3: { halign: 'center', cellWidth: 30 },
           4: { halign: 'center', cellWidth: 15 },
           5: { halign: 'right', cellWidth: 35 },
-          6: { halign: 'center', cellWidth: 22 }
+          6: { halign: 'center', cellWidth: 22 },
         },
         didDrawPage: (data) => {
-          // Footer
           const pageCount = (doc as any).internal.getNumberOfPages();
-          doc.setFontSize(8);
-          doc.setFont('helvetica', 'italic');
-          doc.text(
-            `Halaman ${data.pageNumber} dari ${pageCount}`,
-            pageWidth / 2,
-            doc.internal.pageSize.height - 10,
-            { align: 'center' }
-          );
-        }
+          doc.setFontSize(8).setFont('helvetica', 'italic');
+          doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+        },
       });
-      
-      // Save PDF
+
       doc.save(`Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.pdf`);
       toast.success('Laporan PDF berhasil diexport!');
     } catch (error) {
@@ -281,96 +234,47 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
+            <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
               <p className="text-muted-foreground">The Garden Residence Management</p>
             </div>
           </div>
-          <Button variant="outline" onClick={signOut}>
-            Sign Out
-          </Button>
+          <Button variant="outline" onClick={signOut}>Sign Out</Button>
         </div>
 
-        {/* Stats Cards */}
+        {/* === STATS === */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalBookings}</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {new Intl.NumberFormat('id-ID', {
-                  style: 'currency',
-                  currency: 'IDR'
-                }).format(stats.totalRevenue)}
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Available Rooms</CardTitle>
-              <Bed className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.availableRooms}</div>
-            </CardContent>
-          </Card>
+          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Bookings</CardTitle><Calendar className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.totalBookings}</div></CardContent></Card>
+          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Revenue</CardTitle><DollarSign className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(stats.totalRevenue)}</div></CardContent></Card>
+          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div></CardContent></Card>
+          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Available Rooms</CardTitle><Bed className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.availableRooms}</div></CardContent></Card>
         </div>
 
+        {/* === TAB MENU === */}
         <Tabs defaultValue="bookings" className="space-y-6">
           <TabsList>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="rooms">Room Management</TabsTrigger>
           </TabsList>
-          
+
+          {/* BOOKINGS TABLE */}
           <TabsContent value="bookings">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>Recent Bookings</CardTitle>
-                    <CardDescription>
-                      Manage and track all hotel reservations
-                    </CardDescription>
+                    <CardDescription>Manage and track all hotel reservations</CardDescription>
                   </div>
                   <div className="flex gap-2">
                     <Button onClick={exportFinancialReportCSV} variant="outline" className="gap-2">
-                      <Download className="h-4 w-4" />
-                      Export CSV
+                      <Download className="h-4 w-4" /> Export CSV
                     </Button>
                     <Button onClick={exportFinancialReportPDF} className="gap-2">
-                      <FileText className="h-4 w-4" />
-                      Export PDF
+                      <FileText className="h-4 w-4" /> Export PDF
                     </Button>
                   </div>
                 </div>
@@ -389,61 +293,43 @@ const Dashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {bookings.map((booking) => (
-                      <TableRow key={booking.id}>
+                    {bookings.map((b) => (
+                      <TableRow key={b.id}>
                         <TableCell>
                           <div>
-                            <div className="font-medium">{booking.guest_name}</div>
-                            <div className="text-sm text-muted-foreground">{booking.guest_email}</div>
+                            <div className="font-medium">{b.guest_name}</div>
+                            <div className="text-sm text-muted-foreground">{b.guest_email}</div>
                           </div>
                         </TableCell>
-                        <TableCell>{booking.rooms?.name}</TableCell>
+                        <TableCell>{b.rooms?.name}</TableCell>
                         <TableCell>
                           <div className="text-sm">
-                            <div>{new Date(booking.check_in_date).toLocaleDateString()}</div>
-                            <div className="text-muted-foreground">to {new Date(booking.check_out_date).toLocaleDateString()}</div>
+                            <div>{new Date(b.check_in_date).toLocaleDateString()}</div>
+                            <div className="text-muted-foreground">to {new Date(b.check_out_date).toLocaleDateString()}</div>
                           </div>
                         </TableCell>
-                        <TableCell>{booking.guests_count}</TableCell>
+                        <TableCell>{b.guests_count}</TableCell>
                         <TableCell>
-                          {new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR'
-                          }).format(booking.total_price)}
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={
-                            booking.booking_status === 'confirmed' ? 'default' :
-                            booking.booking_status === 'cancelled' ? 'destructive' : 'secondary'
-                          }>
-                            {booking.booking_status}
+                          <Badge variant={b.booking_status === 'confirmed' ? 'default' : b.booking_status === 'cancelled' ? 'destructive' : 'secondary'}>
+                            {b.booking_status}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            {booking.booking_status === 'confirmed' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-                              >
+                            {b.booking_status === 'confirmed' && (
+                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')}>
                                 Cancel
                               </Button>
                             )}
-                            {booking.booking_status === 'cancelled' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateBookingStatus(booking.id, 'confirmed')}
-                              >
+                            {b.booking_status === 'cancelled' && (
+                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')}>
                                 Restore
                               </Button>
                             )}
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteBooking(booking.id)}
-                            >
+                            <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)}>
                               Delete
                             </Button>
                           </div>
@@ -455,14 +341,13 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
+          {/* ROOMS TABLE */}
           <TabsContent value="rooms">
             <Card>
               <CardHeader>
                 <CardTitle>Room Management</CardTitle>
-                <CardDescription>
-                  Manage room availability and pricing
-                </CardDescription>
+                <CardDescription>Manage room availability and pricing</CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -477,33 +362,26 @@ const Dashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {rooms.map((room) => (
-                      <TableRow key={room.id}>
-                        <TableCell className="font-medium">{room.name}</TableCell>
+                    {rooms.map((r) => (
+                      <TableRow key={r.id}>
+                        <TableCell className="font-medium">{r.name}</TableCell>
                         <TableCell>
                           <Badge variant="secondary" className="capitalize">
-                            {room.type}
+                            {r.type}
                           </Badge>
                         </TableCell>
-                        <TableCell>{room.capacity} guests</TableCell>
+                        <TableCell>{r.capacity} guests</TableCell>
                         <TableCell>
-                          {new Intl.NumberFormat('id-ID', {
-                            style: 'currency',
-                            currency: 'IDR'
-                          }).format(room.price_per_night)}
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={room.is_available ? 'default' : 'destructive'}>
-                            {room.is_available ? 'Available' : 'Unavailable'}
+                          <Badge variant={r.is_available ? 'default' : 'destructive'}>
+                            {r.is_available ? 'Available' : 'Unavailable'}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleRoomAvailability(room.id, room.is_available)}
-                          >
-                            {room.is_available ? 'Disable' : 'Enable'}
+                          <Button size="sm" variant="outline" onClick={() => toggleRoomAvailability(r.id, r.is_available)}>
+                            {r.is_available ? 'Disable' : 'Enable'}
                           </Button>
                         </TableCell>
                       </TableRow>
