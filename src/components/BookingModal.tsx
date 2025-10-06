@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -28,6 +31,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
 
   const handleBooking = async () => {
     if (!room) return;
@@ -50,7 +54,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
         total_price: room.price_per_night * guests,
         booking_status: 'confirmed',
         payment_status: 'pending',
-        payment_method: 'cash',
+        payment_method: paymentMethod,
         user_id: 'anonymous',
       });
 
@@ -68,39 +72,83 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="bg-white p-6 rounded-lg w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">{room?.name}</h2>
-        <input
-          type="text"
-          placeholder="Guest Name"
-          value={guestName}
-          onChange={(e) => setGuestName(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-        <input
-          type="email"
-          placeholder="Guest Email"
-          value={guestEmail}
-          onChange={(e) => setGuestEmail(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-        <input
-          type="text"
-          placeholder="Guest Phone"
-          value={guestPhone}
-          onChange={(e) => setGuestPhone(e.target.value)}
-          className="w-full mb-4 p-2 border rounded"
-        />
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{room?.name}</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="guestName">Nama Tamu</Label>
+            <Input
+              id="guestName"
+              type="text"
+              placeholder="Masukkan nama lengkap"
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+            />
+          </div>
 
-        <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            Cancel
-          </Button>
-          <Button onClick={handleBooking} disabled={loading}>
-            {loading ? 'Booking...' : 'Confirm Booking'}
-          </Button>
+          <div className="space-y-2">
+            <Label htmlFor="guestEmail">Email</Label>
+            <Input
+              id="guestEmail"
+              type="email"
+              placeholder="email@example.com"
+              value={guestEmail}
+              onChange={(e) => setGuestEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="guestPhone">Nomor Telepon</Label>
+            <Input
+              id="guestPhone"
+              type="text"
+              placeholder="08xxxxxxxxxx"
+              value={guestPhone}
+              onChange={(e) => setGuestPhone(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-3">
+            <Label>Metode Pembayaran</Label>
+            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="cash" id="cash" />
+                <Label htmlFor="cash" className="font-normal cursor-pointer">Cash</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="iris_bca" id="iris_bca" />
+                <Label htmlFor="iris_bca" className="font-normal cursor-pointer">IRIS - BCA</Label>
+              </div>
+            </RadioGroup>
+
+            {paymentMethod === 'iris_bca' && (
+              <div className="mt-3 p-4 bg-muted rounded-lg space-y-2">
+                <p className="font-semibold">Transfer ke rekening BCA:</p>
+                <div className="space-y-1">
+                  <p className="text-sm">Nomor Rekening: <span className="font-mono font-bold">1234567890</span></p>
+                  <p className="text-sm">Atas Nama: <span className="font-semibold">Hotel Management</span></p>
+                  <p className="text-sm text-muted-foreground">Silakan transfer sejumlah {new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR'
+                  }).format(room?.price_per_night ? room.price_per_night * guests : 0)}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={onClose} disabled={loading}>
+              Batal
+            </Button>
+            <Button onClick={handleBooking} disabled={loading}>
+              {loading ? 'Memproses...' : 'Konfirmasi Booking'}
+            </Button>
+          </div>
         </div>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 };
