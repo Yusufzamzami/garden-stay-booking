@@ -149,16 +149,27 @@ const Dashboard = () => {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
 
-      doc.setFontSize(18).setFont('helvetica', 'bold');
+      // Header
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
       doc.text('THE GARDEN RESIDENCE', pageWidth / 2, 20, { align: 'center' });
-      doc.setFontSize(14).text('LAPORAN KEUANGAN', pageWidth / 2, 28, { align: 'center' });
 
+      doc.setFontSize(14);
+      doc.text('LAPORAN KEUANGAN', pageWidth / 2, 28, { align: 'center' });
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
       const reportDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-      doc.setFontSize(10).setFont('helvetica', 'normal');
       doc.text(`Tanggal Laporan: ${reportDate}`, pageWidth / 2, 35, { align: 'center' });
 
-      doc.setFontSize(12).setFont('helvetica', 'bold').text('RINGKASAN KEUANGAN', 14, 45);
-      doc.setFontSize(10).setFont('helvetica', 'normal');
+      // Summary Section
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RINGKASAN KEUANGAN', 14, 45);
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+
       const summaryData = [
         ['Total Booking', `: ${stats.totalBookings}`],
         ['Total Pendapatan', `: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.totalRevenue)}`],
@@ -173,6 +184,7 @@ const Dashboard = () => {
         yPos += 6;
       });
 
+      // Table
       const tableData = bookings.map((b) => [
         new Date(b.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
         b.guest_name,
@@ -188,7 +200,7 @@ const Dashboard = () => {
         head: [['Tanggal', 'Nama Tamu', 'Kamar', 'Periode', 'Tamu', 'Total', 'Status']],
         body: tableData,
         theme: 'striped',
-        headStyles: { fillColor: [34, 197, 94], textColor: 255, halign: 'center' },
+        headStyles: { fillColor: [34, 197, 94], textColor: 255, fontStyle: 'bold', halign: 'center' },
         styles: { fontSize: 9, cellPadding: 3 },
         columnStyles: {
           0: { halign: 'center', cellWidth: 25 },
@@ -200,9 +212,16 @@ const Dashboard = () => {
           6: { halign: 'center', cellWidth: 22 },
         },
         didDrawPage: (data) => {
+          // Footer
           const pageCount = (doc as any).internal.getNumberOfPages();
-          doc.setFontSize(8).setFont('helvetica', 'italic');
-          doc.text(`Halaman ${data.pageNumber} dari ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'italic');
+          doc.text(
+            `Halaman ${data.pageNumber} dari ${pageCount}`,
+            pageWidth / 2,
+            doc.internal.pageSize.height - 10,
+            { align: 'center' }
+          );
         },
       });
 
@@ -260,11 +279,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {new Intl.NumberFormat('id-ID', {
-                  style: 'currency',
-                  currency: 'IDR',
-                  minimumFractionDigits: 0
-                }).format(stats.totalRevenue)}
+                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.totalRevenue)}
               </div>
             </CardContent>
           </Card>
