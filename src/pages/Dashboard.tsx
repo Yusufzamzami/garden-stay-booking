@@ -26,9 +26,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      fetchDashboardData();
-    }
+    if (user) fetchDashboardData();
   }, [user]);
 
   const fetchDashboardData = async () => {
@@ -102,7 +100,6 @@ const Dashboard = () => {
     }
   };
 
-  // === EXPORT LAPORAN KEUANGAN CSV ===
   const exportFinancialReportCSV = () => {
     try {
       const headers = [
@@ -147,7 +144,6 @@ const Dashboard = () => {
     }
   };
 
-  // === EXPORT LAPORAN KEUANGAN PDF ===
   const exportFinancialReportPDF = () => {
     try {
       const doc = new jsPDF();
@@ -247,20 +243,61 @@ const Dashboard = () => {
 
         {/* === STATS === */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Bookings</CardTitle><Calendar className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.totalBookings}</div></CardContent></Card>
-          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Revenue</CardTitle><DollarSign className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(stats.totalRevenue)}</div></CardContent></Card>
-          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div></CardContent></Card>
-          <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Available Rooms</CardTitle><Bed className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{stats.availableRooms}</div></CardContent></Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalBookings}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {new Intl.NumberFormat('id-ID', {
+                  style: 'currency',
+                  currency: 'IDR',
+                  minimumFractionDigits: 0
+                }).format(stats.totalRevenue)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Available Rooms</CardTitle>
+              <Bed className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.availableRooms}</div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* === TAB MENU === */}
+        {/* === TABS === */}
         <Tabs defaultValue="bookings" className="space-y-6">
           <TabsList>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="rooms">Room Management</TabsTrigger>
           </TabsList>
 
-          {/* BOOKINGS TABLE */}
+          {/* BOOKINGS */}
           <TabsContent value="bookings">
             <Card>
               <CardHeader>
@@ -310,28 +347,22 @@ const Dashboard = () => {
                         </TableCell>
                         <TableCell>{b.guests_count}</TableCell>
                         <TableCell>
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(b.total_price)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={b.booking_status === 'confirmed' ? 'default' : b.booking_status === 'cancelled' ? 'destructive' : 'secondary'}>
+                          <Badge variant={b.booking_status === 'confirmed' ? 'default' : 'destructive'}>
                             {b.booking_status}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             {b.booking_status === 'confirmed' && (
-                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')}>
-                                Cancel
-                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')}>Cancel</Button>
                             )}
                             {b.booking_status === 'cancelled' && (
-                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')}>
-                                Restore
-                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')}>Restore</Button>
                             )}
-                            <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)}>
-                              Delete
-                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)}>Delete</Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -342,7 +373,7 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
 
-          {/* ROOMS TABLE */}
+          {/* ROOMS */}
           <TabsContent value="rooms">
             <Card>
               <CardHeader>
@@ -366,13 +397,11 @@ const Dashboard = () => {
                       <TableRow key={r.id}>
                         <TableCell className="font-medium">{r.name}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="capitalize">
-                            {r.type}
-                          </Badge>
+                          <Badge variant="secondary" className="capitalize">{r.type}</Badge>
                         </TableCell>
                         <TableCell>{r.capacity} guests</TableCell>
                         <TableCell>
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(r.price_per_night)}
                         </TableCell>
                         <TableCell>
                           <Badge variant={r.is_available ? 'default' : 'destructive'}>
