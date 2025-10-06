@@ -9,16 +9,16 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       <Hero />
-      <section aria-label="Search and booking">
+      <section aria-label="Pencarian dan Pemesanan">
         <SearchForm />
       </section>
-      <section aria-label="Room showcase">
+      <section aria-label="Tampilan Kamar Hotel">
         <RoomShowcase />
       </section>
-      <section aria-label="Hotel facilities">
+      <section aria-label="Fasilitas Hotel">
         <Facilities />
       </section>
-      <section aria-label="Guest testimonials">
+      <section aria-label="Testimoni Tamu">
         <Testimonials />
       </section>
       <Footer />

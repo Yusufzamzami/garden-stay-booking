@@ -125,10 +125,10 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            Complete Your Booking
+            Selesaikan Pemesanan Anda
           </DialogTitle>
           <DialogDescription>
-            Please fill in your details to confirm your reservation
+            Silakan isi detail Anda untuk mengonfirmasi reservasi Anda
           </DialogDescription>
         </DialogHeader>
 
@@ -136,14 +136,14 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
           <div className="space-y-6">
             {/* Booking Summary */}
             <div className="bg-primary-soft/10 p-4 rounded-lg">
-              <h3 className="font-semibold text-foreground mb-2">Booking Summary</h3>
+              <h3 className="font-semibold text-foreground mb-2">Ringkasan Pemesanan</h3>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Room:</span>
                   <span className="font-medium">{room.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Check-in:</span>
+                  <span>Lapor masuk:</span>
                   <span>{new Date(checkIn).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
@@ -151,26 +151,33 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   <span>{new Date(checkOut).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Nights:</span>
+                  <span>Malam:</span>
                   <span>{calculateNights()}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Guests:</span>
+                  <span>Tamu:</span>
                   <span>{guests}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-foreground border-t pt-2">
-                  <span>Total Price:</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                <span>Harga Total:</span>
+                <span>
+                {new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                 currency: 'IDR',
+                minimumFractionDigits: 0
+                  })
+                 .format(totalPrice * 1000)
+                  .replace(/\s/g, '')} 
+                </span>
                 </div>
               </div>
             </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="guest-name" className="flex items-center gap-2">
                     <User className="h-4 w-4 text-primary" />
-                    Guest Name
+                    Nama Tamu
                   </Label>
                   <Input
                     id="guest-name"
@@ -217,7 +224,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                 <div className="space-y-2">
                   <Label htmlFor="payment-method" className="flex items-center gap-2">
                     <CreditCard className="h-4 w-4 text-primary" />
-                    Payment Method
+                    Metode Pembayaran
                   </Label>
                   <Select value={bookingData.paymentMethod} onValueChange={(value) => setBookingData({...bookingData, paymentMethod: value})}>
                     <SelectTrigger>
@@ -250,7 +257,13 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading} className="flex-1">
-                  {isLoading ? "Processing..." : `Confirm Booking - $${totalPrice.toFixed(2)}`}
+                {isLoading
+                ? "Processing..."
+                 : `Konfirmasi Pemesanan - ${new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                  minimumFractionDigits: 0
+                  }).format(totalPrice * 1000)}`}
                 </Button>
               </div>
             </form>

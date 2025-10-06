@@ -123,7 +123,11 @@ const Rooms = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-primary">
-                        ${room.price_per_night}
+                        {new Intl.NumberFormat('id-ID', {
+                          style: 'currency',
+                          currency: 'IDR',
+                          minimumFractionDigits: 3
+                        }).format(room.price_per_night)}
                       </div>
                       <div className="text-sm text-muted-foreground">per night</div>
                     </div>

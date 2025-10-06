@@ -12,9 +12,9 @@ const rooms = [
     id: 1,
     name: "Deluxe Garden Room",
     image: deluxeRoom,
-    price: 1250000,
+    price: 250.000,
     capacity: 2,
-    size: "35 m²",
+    size: "10 m²",
     features: ["King Bed", "Garden View", "Free WiFi", "Mini Bar"],
     amenities: [
       { icon: Bed, label: "King Bed" },
@@ -22,15 +22,15 @@ const rooms = [
       { icon: Coffee, label: "Mini Bar" },
       { icon: Bath, label: "Private Bath" }
     ],
-    description: "Elegant room with stunning garden views and modern amenities."
+    description: "Kamar elegan dengan pemandangan taman yang menakjubkan dan fasilitas modern."
   },
   {
     id: 2,
     name: "Garden Suite",
     image: suiteRoom,
-    price: 2100000,
+    price: 300.000,
     capacity: 4,
-    size: "65 m²",
+    size: "15 m²",
     features: ["Living Area", "Balcony", "Garden View", "Premium Amenities"],
     amenities: [
       { icon: Bed, label: "King Bed" },
@@ -38,15 +38,15 @@ const rooms = [
       { icon: Car, label: "Valet Parking" },
       { icon: Coffee, label: "Premium Bar" }
     ],
-    description: "Spacious suite with separate living area and private balcony."
+    description: "Suite yang luas dengan ruang tamu terpisah dan balkon pribadi."
   },
   {
     id: 3,
     name: "Presidential Suite",
     image: gardenView,
-    price: 3500000,
-    capacity: 6,
-    size: "120 m²",
+    price: 350.000,
+    capacity: 3,
+    size: "20 m²",
     features: ["2 Bedrooms", "Panoramic Views", "Butler Service", "Private Terrace"],
     amenities: [
       { icon: Bed, label: "2 Bedrooms" },
@@ -54,29 +54,30 @@ const rooms = [
       { icon: Car, label: "Private Parking" },
       { icon: Coffee, label: "Premium Lounge" }
     ],
-    description: "Ultimate luxury with panoramic garden views and personalized service."
+    description: "Kemewahan terbaik dengan pemandangan taman yang indah dan layanan yang dipersonalisasi.."
   }
 ];
 
-const RoomShowcase = memo(() => {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 3,
+    maximumFractionDigits: 3
+  }).format(price);
+};
 
+const RoomShowcase = memo(() => {
   return (
     <section className="py-20 bg-gradient-to-b from-background to-secondary/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Luxury <span className="text-primary">Accommodations</span>
+          Kemewahan <span className="text-primary">Akomodasi</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Choose from our carefully curated collection of rooms and suites, 
-            each designed to provide the ultimate comfort and elegance.
+            Pilih dari koleksi kamar dan suite kami yang dikurasi dengan cermat,
+            masing-masing dirancang untuk memberikan kenyamanan dan keanggunan terbaik.
           </p>
         </div>
 

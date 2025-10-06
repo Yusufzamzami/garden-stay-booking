@@ -17,63 +17,63 @@ import {
 const facilities = [
   {
     icon: Utensils,
-    title: "Fine Dining Restaurant",
-    description: "Experience culinary excellence with our award-winning chef's seasonal menu featuring local and international cuisine."
+    title: "Fine Dining Restauarant",
+    description: "Nikmati pengalaman kuliner terbaik dengan menu musiman koki pemenang penghargaan kami yang menyajikan masakan lokal dan internasional."
   },
   {
     icon: Dumbbell,
     title: "Fitness Center",
-    description: "State-of-the-art gym equipment and personal training services available 24/7 for our guests."
+    description: "Peralatan olahraga canggih dan layanan pelatihan pribadi tersedia 24/7 untuk tamu kami."
   },
   {
     icon: Waves,
     title: "Infinity Pool",
-    description: "Relax in our stunning infinity pool with panoramic garden views and poolside service."
+    description: "Bersantailah di kolam renang infinity kami yang menakjubkan dengan pemandangan taman yang indah dan layanan di tepi kolam renang."
   },
   {
     icon: Flower,
     title: "Garden Spa",
-    description: "Rejuvenate your senses with our luxury spa treatments in a serene garden setting."
+    description: "Segarkan indra Anda dengan perawatan spa mewah kami di taman yang tenang."
   },
   {
     icon: Car,
     title: "Valet Parking",
-    description: "Complimentary valet parking service for all guests with 24-hour vehicle security."
+    description: "Layanan valet parkir gratis untuk semua tamu dengan keamanan kendaraan 24 jam."
   },
   {
     icon: Wifi,
     title: "High-Speed WiFi",
-    description: "Stay connected with complimentary high-speed internet access throughout the property."
+    description: "Tetap terhubung dengan akses internet berkecepatan tinggi gratis di seluruh properti."
   },
   {
     icon: Coffee,
     title: "24/7 Room Service",
-    description: "Enjoy gourmet meals and beverages delivered to your room at any time of day."
+    description: "Nikmati hidangan dan minuman lezat yang diantar ke kamar Anda kapan saja sepanjang hari.."
   },
   {
     icon: ShieldCheck,
     title: "Concierge Service",
-    description: "Our dedicated concierge team is available to assist with any requests or arrangements."
+    description: "Tim concierge kami yang berdedikasi siap membantu segala permintaan atau pengaturan Anda."
   },
   {
     icon: Sparkles,
     title: "Event Spaces",
-    description: "Elegant venues for weddings, conferences, and special events with full planning services."
+    description: "Tempat elegan untuk pernikahan, konferensi, dan acara khusus dengan layanan perencanaan lengkap."
   },
   {
     icon: Users,
     title: "Business Center",
-    description: "Fully equipped business center with meeting rooms and conference facilities."
+    description: "Pusat bisnis yang lengkap dengan ruang pertemuan dan fasilitas konferensi."
   },
   {
     icon: Clock,
     title: "24-Hour Front Desk",
-    description: "Round-the-clock assistance from our professional and friendly front desk staff."
+    description: "Bantuan sepanjang waktu dari staf meja depan kami yang profesional dan ramah."
   },
   {
     icon: MapPin,
     title: "Tour Services",
-    description: "Discover local attractions with our curated tour packages and travel arrangements."
+    description: "Temukan atraksi lokal dengan paket wisata dan pengaturan perjalanan pilihan kami."
   }
 ];
 
@@ -86,8 +86,8 @@ const Facilities = () => {
             World-Class <span className="text-primary">Facilities</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Discover an array of premium amenities and services designed to make 
-            your stay unforgettable. Every detail crafted for your comfort and pleasure.
+            Temukan beragam fasilitas dan layanan premium yang dirancang untuk menjadikan masa menginap Anda tak terlupakan. 
+            Setiap detail dirancang untuk kenyamanan dan kesenangan Anda.
           </p>
         </div>
 

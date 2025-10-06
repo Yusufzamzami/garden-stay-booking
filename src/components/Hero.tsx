@@ -74,8 +74,8 @@ const Hero = memo(() => {
           </h1>
           
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 leading-relaxed px-2 sm:px-0 animate-fade-in">
-            Experience luxury and tranquility in our garden paradise. 
-            Where elegance meets nature's embrace.
+            Nikmati kemewahan dan ketenangan di surga taman kami.
+            Di mana keanggunan bertemu dengan pelukan alam.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4 sm:px-0">

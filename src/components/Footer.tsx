@@ -23,8 +23,8 @@ const Footer = () => {
               <div>
                 <h3 className="text-2xl font-bold mb-2">The Garden Residence</h3>
                 <p className="text-primary-foreground/80 leading-relaxed">
-                  Experience luxury and tranquility in our garden paradise. 
-                  Where elegance meets nature's embrace.
+                  Nikmati kemewahan dan ketenangan di surga taman kami.
+                  Di mana keanggunan bertemu dengan pelukan alam.
                 </p>
               </div>
               

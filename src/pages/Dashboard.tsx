@@ -6,8 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, DollarSign, Users, Bed, ArrowLeft } from 'lucide-react';
+import { Calendar, DollarSign, Users, Bed, ArrowLeft, Download, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const Dashboard = () => {
   const { user, signOut } = useAuth();
@@ -101,6 +104,167 @@ const Dashboard = () => {
     }
   };
 
+  const deleteBooking = async (bookingId: string) => {
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', bookingId);
+
+      if (error) throw error;
+      fetchDashboardData(); // Refresh data
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+    }
+  };
+
+  const exportFinancialReportCSV = () => {
+    try {
+      // Prepare CSV data
+      const headers = ['Tanggal Booking', 'Nama Tamu', 'Email', 'Telepon', 'Kamar', 'Check-in', 'Check-out', 'Jumlah Tamu', 'Total Harga (IDR)', 'Status Pembayaran', 'Status Booking'];
+      
+      const rows = bookings.map(booking => [
+        new Date(booking.created_at).toLocaleDateString('id-ID'),
+        booking.guest_name,
+        booking.guest_email,
+        booking.guest_phone,
+        booking.rooms?.name || '-',
+        new Date(booking.check_in_date).toLocaleDateString('id-ID'),
+        new Date(booking.check_out_date).toLocaleDateString('id-ID'),
+        booking.guests_count,
+        new Intl.NumberFormat('id-ID').format(booking.total_price),
+        booking.payment_status,
+        booking.booking_status
+      ]);
+
+      // Create CSV content
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      // Create blob and download
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Laporan CSV berhasil diexport!');
+    } catch (error) {
+      console.error('Error exporting CSV report:', error);
+      toast.error('Gagal mengexport laporan CSV');
+    }
+  };
+
+  const exportFinancialReportPDF = () => {
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Header
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('THE GARDEN RESIDENCE', pageWidth / 2, 20, { align: 'center' });
+      
+      doc.setFontSize(14);
+      doc.text('LAPORAN KEUANGAN', pageWidth / 2, 28, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const reportDate = new Date().toLocaleDateString('id-ID', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+      doc.text(`Tanggal Laporan: ${reportDate}`, pageWidth / 2, 35, { align: 'center' });
+      
+      // Summary Section
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('RINGKASAN KEUANGAN', 14, 45);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      
+      const summaryData = [
+        ['Total Booking', `: ${stats.totalBookings}`],
+        ['Total Pendapatan', `: ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.totalRevenue)}`],
+        ['Tingkat Okupansi', `: ${stats.occupancyRate.toFixed(1)}%`],
+        ['Kamar Tersedia', `: ${stats.availableRooms}`]
+      ];
+      
+      let yPos = 52;
+      summaryData.forEach(([label, value]) => {
+        doc.text(label, 14, yPos);
+        doc.text(value, 60, yPos);
+        yPos += 6;
+      });
+      
+      // Table
+      const tableData = bookings.map(booking => [
+        new Date(booking.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+        booking.guest_name,
+        booking.rooms?.name || '-',
+        `${new Date(booking.check_in_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })} - ${new Date(booking.check_out_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' })}`,
+        booking.guests_count.toString(),
+        new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(booking.total_price),
+        booking.booking_status === 'confirmed' ? 'Confirmed' : 'Cancelled'
+      ]);
+
+      autoTable(doc, {
+        startY: yPos + 5,
+        head: [['Tanggal', 'Nama Tamu', 'Kamar', 'Periode', 'Tamu', 'Total', 'Status']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [34, 197, 94],
+          textColor: 255,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { halign: 'center', cellWidth: 25 },
+          1: { halign: 'left', cellWidth: 35 },
+          2: { halign: 'left', cellWidth: 30 },
+          3: { halign: 'center', cellWidth: 30 },
+          4: { halign: 'center', cellWidth: 15 },
+          5: { halign: 'right', cellWidth: 35 },
+          6: { halign: 'center', cellWidth: 22 }
+        },
+        didDrawPage: (data) => {
+          // Footer
+          const pageCount = (doc as any).internal.getNumberOfPages();
+          doc.setFontSize(8);
+          doc.setFont('helvetica', 'italic');
+          doc.text(
+            `Halaman ${data.pageNumber} dari ${pageCount}`,
+            pageWidth / 2,
+            doc.internal.pageSize.height - 10,
+            { align: 'center' }
+          );
+        }
+      });
+      
+      // Save PDF
+      doc.save(`Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Laporan PDF berhasil diexport!');
+    } catch (error) {
+      console.error('Error exporting PDF report:', error);
+      toast.error('Gagal mengexport laporan PDF');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -153,7 +317,12 @@ const Dashboard = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">
+                {new Intl.NumberFormat('id-ID', {
+                  style: 'currency',
+                  currency: 'IDR'
+                }).format(stats.totalRevenue)}
+              </div>
             </CardContent>
           </Card>
           
@@ -187,10 +356,24 @@ const Dashboard = () => {
           <TabsContent value="bookings">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Bookings</CardTitle>
-                <CardDescription>
-                  Manage and track all hotel reservations
-                </CardDescription>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Recent Bookings</CardTitle>
+                    <CardDescription>
+                      Manage and track all hotel reservations
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={exportFinancialReportCSV} variant="outline" className="gap-2">
+                      <Download className="h-4 w-4" />
+                      Export CSV
+                    </Button>
+                    <Button onClick={exportFinancialReportPDF} className="gap-2">
+                      <FileText className="h-4 w-4" />
+                      Export PDF
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -222,7 +405,12 @@ const Dashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell>{booking.guests_count}</TableCell>
-                        <TableCell>${booking.total_price}</TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR'
+                          }).format(booking.total_price)}
+                        </TableCell>
                         <TableCell>
                           <Badge variant={
                             booking.booking_status === 'confirmed' ? 'default' :
@@ -251,6 +439,13 @@ const Dashboard = () => {
                                 Restore
                               </Button>
                             )}
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBooking(booking.id)}
+                            >
+                              Delete
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -291,7 +486,12 @@ const Dashboard = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>{room.capacity} guests</TableCell>
-                        <TableCell>${room.price_per_night}</TableCell>
+                        <TableCell>
+                          {new Intl.NumberFormat('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR'
+                          }).format(room.price_per_night)}
+                        </TableCell>
                         <TableCell>
                           <Badge variant={room.is_available ? 'default' : 'destructive'}>
                             {room.is_available ? 'Available' : 'Unavailable'}

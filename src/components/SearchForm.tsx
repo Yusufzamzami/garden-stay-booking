@@ -21,18 +21,18 @@ const SearchForm = () => {
       guests: searchData.guests,
       roomType: searchData.roomType || 'any'
     });
-    window.location.href = `/rooms?${params.toString()}`;
-  };
+  window.location.href = `/rooms?${params.toString()}`;
+};
 
-  return (
-    <section className="py-16 bg-gradient-to-b from-background to-primary-soft/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+return (
+  <section className="py-16 bg-gradient-to-b from-background to-primary-soft/20">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Find Your Perfect Room
+            Temukan Kamar Sempurna Anda
           </h2>
           <p className="text-lg text-muted-foreground">
-            Search for available rooms and enjoy luxury at its finest
+            Cari kamar yang tersedia dan nikmati kemewahan terbaiknya
           </p>
         </div>
 
@@ -42,7 +42,7 @@ const SearchForm = () => {
               <div className="space-y-2">
                 <Label htmlFor="checkin" className="flex items-center gap-2 text-foreground font-medium">
                   <Calendar className="h-4 w-4 text-primary" />
-                  Check-in Date
+                  Tanggal Check-in
                 </Label>
                 <Input
                   id="checkin"
@@ -56,7 +56,7 @@ const SearchForm = () => {
               <div className="space-y-2">
                 <Label htmlFor="checkout" className="flex items-center gap-2 text-foreground font-medium">
                   <Calendar className="h-4 w-4 text-primary" />
-                  Check-out Date
+                  Tanggal Check-out
                 </Label>
                 <Input
                   id="checkout"
@@ -70,18 +70,18 @@ const SearchForm = () => {
               <div className="space-y-2">
                 <Label htmlFor="guests" className="flex items-center gap-2 text-foreground font-medium">
                   <Users className="h-4 w-4 text-primary" />
-                  Guests
+                  Tamu
                 </Label>
                 <Select value={searchData.guests} onValueChange={(value) => setSearchData({...searchData, guests: value})}>
                   <SelectTrigger className="border-primary/20 focus:border-primary">
                     <SelectValue placeholder="Select guests" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 Guest</SelectItem>
-                    <SelectItem value="2">2 Guests</SelectItem>
-                    <SelectItem value="3">3 Guests</SelectItem>
-                    <SelectItem value="4">4 Guests</SelectItem>
-                    <SelectItem value="5">5+ Guests</SelectItem>
+                    <SelectItem value="1">1 Tamu</SelectItem>
+                    <SelectItem value="2">2 Tamu</SelectItem>
+                    <SelectItem value="3">3 Tamu</SelectItem>
+                    <SelectItem value="4">4 Tamu</SelectItem>
+                    <SelectItem value="5">5+ Tamu</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -89,7 +89,7 @@ const SearchForm = () => {
               <div className="space-y-2">
                 <Label htmlFor="roomtype" className="flex items-center gap-2 text-foreground font-medium">
                   <MapPin className="h-4 w-4 text-primary" />
-                  Room Type
+                  Tipe Kamar
                 </Label>
                 <Select value={searchData.roomType} onValueChange={(value) => setSearchData({...searchData, roomType: value})}>
                   <SelectTrigger className="border-primary/20 focus:border-primary">
@@ -113,7 +113,7 @@ const SearchForm = () => {
                 className="px-12 py-4 text-lg"
               >
                 <Search className="mr-2 h-5 w-5" />
-                Search Available Rooms
+                Cari Kamar yang Tersedia
               </Button>
             </div>
           </CardContent>

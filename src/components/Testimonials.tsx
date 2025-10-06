@@ -7,48 +7,48 @@ const testimonials = [
     name: "Sarah Johnson",
     location: "Jakarta, Indonesia",
     rating: 5,
-    review: "Absolutely stunning property! The Garden Residence exceeded all my expectations. The room was immaculate, the service impeccable, and the garden views were breathtaking. Will definitely return!",
-    date: "March 2024"
+    review: "Properti yang benar-benar menakjubkan! The Garden Residence melampaui semua harapan saya. Kamarnya sangat bersih, pelayanannya sempurna, dan pemandangan tamannya sungguh memukau. Saya pasti akan kembali lagi!",
+    date: "Maret 2024"
   },
   {
     id: 2,
     name: "Michael Chen",
-    location: "Singapore",
+    location: "Bali, Indonesia",
     rating: 5,
-    review: "One of the best hotel experiences I've ever had. The attention to detail is remarkable, from the elegant room design to the exceptional spa services. The staff made us feel like royalty.",
-    date: "February 2024"
+    review: "Salah satu pengalaman menginap terbaik yang pernah saya rasakan. Perhatian terhadap detailnya luar biasa, mulai dari desain kamar yang elegan hingga layanan spa yang istimewa. Stafnya membuat kami merasa seperti bangsawan.",
+    date: "Februari 2024"
   },
   {
     id: 3,
     name: "Emma Rodriguez",
-    location: "Manila, Philippines",
+    location: "Jakarta, Indonesia",
     rating: 5,
-    review: "Perfect for our anniversary celebration! The romantic atmosphere, delicious cuisine, and luxurious amenities made our stay unforgettable. The concierge team went above and beyond.",
-    date: "January 2024"
+    review: "Sempurna untuk perayaan hari jadi kami! Suasana romantis, hidangan yang lezat, dan fasilitas mewah membuat masa menginap kami tak terlupakan. Tim concierge benar-benar memberikan pelayanan yang luar biasa.",
+    date: "Januari 2024"
   },
   {
     id: 4,
     name: "David Kim",
-    location: "Seoul, South Korea",
+    location: "Bandung, Indonesia",
     rating: 5,
-    review: "Business trip turned into a relaxing retreat. The business center facilities were excellent, and after meetings, the pool and spa were perfect for unwinding. Highly recommended!",
-    date: "March 2024"
+    review: "Perjalanan bisnis berubah menjadi liburan yang menenangkan. Fasilitas pusat bisnisnya sangat baik, dan setelah rapat, kolam renang serta spa menjadi tempat sempurna untuk bersantai. Sangat direkomendasikan!",
+    date: "Maret 2024"
   },
   {
     id: 5,
     name: "Lisa Thompson",
-    location: "Sydney, Australia",
+    location: "Bandung, Indonesia",
     rating: 5,
-    review: "The Garden Residence is a hidden gem! The peaceful garden setting combined with modern luxury creates the perfect escape. The restaurant's cuisine was absolutely divine.",
-    date: "February 2024"
+    review: "The Garden Residence adalah permata tersembunyi! Suasana taman yang tenang dipadukan dengan kemewahan modern menciptakan tempat pelarian yang sempurna. Hidangan di restorannya benar-benar luar biasa.",
+    date: "Februari 2024"
   },
   {
     id: 6,
     name: "Carlos Mendoza",
-    location: "Mexico City, Mexico",
+    location: "Jakarta, Indonesia",
     rating: 5,
-    review: "Exceptional hospitality and stunning accommodations. Every moment of our stay was perfect, from the welcome drinks to the farewell gift. This place truly understands luxury.",
-    date: "January 2024"
+    review: "Keramahan yang luar biasa dan akomodasi yang memukau. Setiap momen selama kami menginap terasa sempurna, mulai dari minuman sambutan hingga hadiah perpisahan. Tempat ini benar-benar memahami arti kemewahan.",
+    date: "Januari 2024"
   }
 ];
 
@@ -64,11 +64,10 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            What Our <span className="text-primary">Guests Say</span>
+            Apa Kata <span className="text-primary">Tamu Kami</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Read authentic reviews from our valued guests who have experienced 
-            the luxury and hospitality that defines The Garden Residence.
+            Baca ulasan asli dari para tamu kami yang telah merasakan kemewahan dan keramahtamahan yang menjadi ciri khas The Garden Residence.
           </p>
         </div>
 
@@ -122,7 +121,7 @@ const Testimonials = () => {
             </div>
             <div className="w-px h-6 bg-border"></div>
             <div className="text-muted-foreground">
-              Based on <span className="font-semibold text-foreground">500+</span> reviews
+              Berdasarkan <span className="font-semibold text-foreground">500+</span> reviews
             </div>
           </div>
         </div>
