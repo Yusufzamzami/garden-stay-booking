@@ -5,16 +5,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import BookingModal from '@/components/BookingModal';
+import BookingModal, { Room } from '@/components/BookingModal';
 import { ArrowLeft, Users, Wifi, Snowflake, Car, Calendar } from 'lucide-react';
 
 const Rooms = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const checkIn = searchParams.get('checkIn') || '';
@@ -35,8 +35,8 @@ const Rooms = () => {
       }
 
       const { data, error } = await query.order('price_per_night', { ascending: true });
-
       if (error) throw error;
+
       setRooms(data || []);
     } catch (error) {
       console.error('Error fetching rooms:', error);
@@ -45,7 +45,7 @@ const Rooms = () => {
     }
   };
 
-  const handleBookRoom = (room: any) => {
+  const handleBookRoom = (room: Room) => {
     if (!user) {
       navigate('/auth');
       return;
@@ -148,7 +148,7 @@ const Rooms = () => {
                   <div className="space-y-2 mb-6">
                     <p className="text-sm font-medium text-foreground">Amenities:</p>
                     <div className="flex flex-wrap gap-2">
-                      {room.amenities?.slice(0, 3).map((amenity: string, index: number) => (
+                      {room.amenities?.slice(0, 3).map((amenity, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-1 text-xs text-muted-foreground bg-primary-soft/10 px-2 py-1 rounded-full"
@@ -157,9 +157,9 @@ const Rooms = () => {
                           <span>{amenity}</span>
                         </div>
                       ))}
-                      {room.amenities?.length > 3 && (
+                      {room.amenities?.length! > 3 && (
                         <div className="text-xs text-muted-foreground bg-primary-soft/10 px-2 py-1 rounded-full">
-                          +{room.amenities.length - 3} more
+                          +{room.amenities!.length - 3} more
                         </div>
                       )}
                     </div>
