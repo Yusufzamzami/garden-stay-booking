@@ -287,7 +287,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0">
               <div className="text-base sm:text-2xl font-bold">
-                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(stats.totalRevenue)}
+                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(stats.totalRevenue)}
               </div>
             </CardContent>
           </Card>
@@ -383,7 +383,7 @@ const Dashboard = () => {
                           <div className="col-span-2">
                             <span className="text-muted-foreground">Total:</span>
                             <div className="font-bold text-primary">
-                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(b.total_price)}
                             </div>
                           </div>
                         </div>
@@ -440,7 +440,7 @@ const Dashboard = () => {
                           </TableCell>
                           <TableCell>{b.guests_count}</TableCell>
                           <TableCell>
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(b.total_price)}
                           </TableCell>
                           <TableCell>
                             <Badge variant={b.booking_status === 'confirmed' ? 'default' : 'destructive'}>
@@ -500,7 +500,7 @@ const Dashboard = () => {
                           <div>
                             <span className="text-muted-foreground">Harga/Malam:</span>
                             <div className="font-bold text-primary">
-                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(r.price_per_night)}
                             </div>
                           </div>
                         </div>
@@ -540,7 +540,7 @@ const Dashboard = () => {
                           </TableCell>
                           <TableCell>{r.capacity} guests</TableCell>
                           <TableCell>
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(r.price_per_night)}
                           </TableCell>
                           <TableCell>
                             <Badge variant={r.is_available ? 'default' : 'destructive'}>
