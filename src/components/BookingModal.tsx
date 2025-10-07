@@ -55,7 +55,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
         booking_status: 'confirmed',
         payment_status: 'pending',
         payment_method: paymentMethod,
-        user_id: 'anonymous',
+        user_id: '00000000-0000-0000-0000-000000000000',
       });
 
       if (error) throw error;
