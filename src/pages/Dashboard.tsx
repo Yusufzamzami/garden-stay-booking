@@ -246,192 +246,317 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate('/')} className="text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')} 
+              className="text-muted-foreground hover:text-foreground -ml-2 sm:ml-0"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" /> Kembali
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-              <p className="text-muted-foreground">The Garden Residence Management</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Admin Dashboard</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">The Garden Residence</p>
             </div>
           </div>
-          <Button variant="outline" onClick={signOut}>Sign Out</Button>
+          <Button variant="outline" size="sm" onClick={signOut} className="w-full sm:w-auto">
+            Sign Out
+          </Button>
         </div>
 
-        {/* === STATS === */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+        {/* Stats Cards - Mobile Optimized */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <Card className="hover-scale">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Bookings</CardTitle>
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalBookings}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.totalBookings}</div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <Card className="hover-scale">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(stats.totalRevenue)}
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-base sm:text-2xl font-bold">
+                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(stats.totalRevenue)}
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+          <Card className="hover-scale">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Occupancy Rate</CardTitle>
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.occupancyRate.toFixed(1)}%</div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Available Rooms</CardTitle>
-              <Bed className="h-4 w-4 text-muted-foreground" />
+          <Card className="hover-scale">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 p-4 sm:p-6">
+              <CardTitle className="text-xs sm:text-sm font-medium">Available Rooms</CardTitle>
+              <Bed className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.availableRooms}</div>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="text-xl sm:text-2xl font-bold">{stats.availableRooms}</div>
             </CardContent>
           </Card>
         </div>
 
-        {/* === TABS === */}
-        <Tabs defaultValue="bookings" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="bookings">Bookings</TabsTrigger>
-            <TabsTrigger value="rooms">Room Management</TabsTrigger>
+        {/* Tabs - Mobile Optimized */}
+        <Tabs defaultValue="bookings" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 h-auto">
+            <TabsTrigger value="bookings" className="text-xs sm:text-sm py-2 sm:py-2.5">
+              Bookings
+            </TabsTrigger>
+            <TabsTrigger value="rooms" className="text-xs sm:text-sm py-2 sm:py-2.5">
+              Room Management
+            </TabsTrigger>
           </TabsList>
 
-          {/* BOOKINGS */}
+          {/* BOOKINGS - Mobile Optimized */}
           <TabsContent value="bookings">
             <Card>
-              <CardHeader>
-                <div className="flex justify-between items-start">
+              <CardHeader className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div>
-                    <CardTitle>Recent Bookings</CardTitle>
-                    <CardDescription>Manage and track all hotel reservations</CardDescription>
+                    <CardTitle className="text-lg sm:text-xl">Recent Bookings</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Kelola semua reservasi hotel</CardDescription>
                   </div>
-                  <div className="flex gap-2">
-                    <Button onClick={exportFinancialReportCSV} variant="outline" className="gap-2">
-                      <Download className="h-4 w-4" /> Export CSV
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Button onClick={exportFinancialReportCSV} variant="outline" size="sm" className="gap-2 w-full sm:w-auto">
+                      <Download className="h-4 w-4" /> 
+                      <span className="hidden sm:inline">Export CSV</span>
+                      <span className="sm:hidden">CSV</span>
                     </Button>
-                    <Button onClick={exportFinancialReportPDF} className="gap-2">
-                      <FileText className="h-4 w-4" /> Export PDF
+                    <Button onClick={exportFinancialReportPDF} size="sm" className="gap-2 w-full sm:w-auto">
+                      <FileText className="h-4 w-4" /> 
+                      <span className="hidden sm:inline">Export PDF</span>
+                      <span className="sm:hidden">PDF</span>
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Guest</TableHead>
-                      <TableHead>Room</TableHead>
-                      <TableHead>Dates</TableHead>
-                      <TableHead>Guests</TableHead>
-                      <TableHead>Total</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {bookings.map((b) => (
-                      <TableRow key={b.id}>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{b.guest_name}</div>
-                            <div className="text-sm text-muted-foreground">{b.guest_email}</div>
+              <CardContent className="p-0 sm:p-6">
+                {/* Mobile Card View */}
+                <div className="sm:hidden space-y-3 p-4">
+                  {bookings.map((b) => (
+                    <Card key={b.id} className="p-4 hover-scale">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm">{b.guest_name}</div>
+                            <div className="text-xs text-muted-foreground">{b.guest_email}</div>
                           </div>
-                        </TableCell>
-                        <TableCell>{b.rooms?.name}</TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{new Date(b.check_in_date).toLocaleDateString()}</div>
-                            <div className="text-muted-foreground">to {new Date(b.check_out_date).toLocaleDateString()}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{b.guests_count}</TableCell>
-                        <TableCell>
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(b.total_price)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={b.booking_status === 'confirmed' ? 'default' : 'destructive'}>
+                          <Badge variant={b.booking_status === 'confirmed' ? 'default' : 'destructive'} className="text-xs">
                             {b.booking_status}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {b.booking_status === 'confirmed' && (
-                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')}>Cancel</Button>
-                            )}
-                            {b.booking_status === 'cancelled' && (
-                              <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')}>Restore</Button>
-                            )}
-                            <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)}>Delete</Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">Kamar:</span>
+                            <div className="font-medium">{b.rooms?.name}</div>
                           </div>
-                        </TableCell>
+                          <div>
+                            <span className="text-muted-foreground">Tamu:</span>
+                            <div className="font-medium">{b.guests_count} orang</div>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">Check-in:</span>
+                            <div className="font-medium">{new Date(b.check_in_date).toLocaleDateString('id-ID')}</div>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">Check-out:</span>
+                            <div className="font-medium">{new Date(b.check_out_date).toLocaleDateString('id-ID')}</div>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="text-muted-foreground">Total:</span>
+                            <div className="font-bold text-primary">
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 pt-2 border-t">
+                          {b.booking_status === 'confirmed' && (
+                            <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')} className="flex-1 text-xs">
+                              Cancel
+                            </Button>
+                          )}
+                          {b.booking_status === 'cancelled' && (
+                            <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')} className="flex-1 text-xs">
+                              Restore
+                            </Button>
+                          )}
+                          <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)} className="flex-1 text-xs">
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Guest</TableHead>
+                        <TableHead>Room</TableHead>
+                        <TableHead>Dates</TableHead>
+                        <TableHead>Guests</TableHead>
+                        <TableHead>Total</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {bookings.map((b) => (
+                        <TableRow key={b.id}>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{b.guest_name}</div>
+                              <div className="text-sm text-muted-foreground">{b.guest_email}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{b.rooms?.name}</TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              <div>{new Date(b.check_in_date).toLocaleDateString()}</div>
+                              <div className="text-muted-foreground">to {new Date(b.check_out_date).toLocaleDateString()}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{b.guests_count}</TableCell>
+                          <TableCell>
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(b.total_price)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={b.booking_status === 'confirmed' ? 'default' : 'destructive'}>
+                              {b.booking_status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              {b.booking_status === 'confirmed' && (
+                                <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'cancelled')}>Cancel</Button>
+                              )}
+                              {b.booking_status === 'cancelled' && (
+                                <Button size="sm" variant="outline" onClick={() => updateBookingStatus(b.id, 'confirmed')}>Restore</Button>
+                              )}
+                              <Button size="sm" variant="destructive" onClick={() => deleteBooking(b.id)}>Delete</Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* ROOMS */}
+          {/* ROOMS - Mobile Optimized */}
           <TabsContent value="rooms">
             <Card>
-              <CardHeader>
-                <CardTitle>Room Management</CardTitle>
-                <CardDescription>Manage room availability and pricing</CardDescription>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-lg sm:text-xl">Room Management</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Kelola ketersediaan dan harga kamar</CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Room Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Capacity</TableHead>
-                      <TableHead>Price/Night</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rooms.map((r) => (
-                      <TableRow key={r.id}>
-                        <TableCell className="font-medium">{r.name}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary" className="capitalize">{r.type}</Badge>
-                        </TableCell>
-                        <TableCell>{r.capacity} guests</TableCell>
-                        <TableCell>
-                          {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(r.price_per_night)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={r.is_available ? 'default' : 'destructive'}>
+              <CardContent className="p-0 sm:p-6">
+                {/* Mobile Card View */}
+                <div className="sm:hidden space-y-3 p-4">
+                  {rooms.map((r) => (
+                    <Card key={r.id} className="p-4 hover-scale">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-semibold">{r.name}</div>
+                            <Badge variant="secondary" className="capitalize text-xs mt-1">
+                              {r.type}
+                            </Badge>
+                          </div>
+                          <Badge variant={r.is_available ? 'default' : 'destructive'} className="text-xs">
                             {r.is_available ? 'Available' : 'Unavailable'}
                           </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="outline" onClick={() => toggleRoomAvailability(r.id, r.is_available)}>
-                            {r.is_available ? 'Disable' : 'Enable'}
-                          </Button>
-                        </TableCell>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div>
+                            <span className="text-muted-foreground">Kapasitas:</span>
+                            <div className="font-medium">{r.capacity} tamu</div>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Harga/Malam:</span>
+                            <div className="font-bold text-primary">
+                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => toggleRoomAvailability(r.id, r.is_available)}
+                          className="w-full text-xs"
+                        >
+                          {r.is_available ? 'Nonaktifkan' : 'Aktifkan'}
+                        </Button>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Room Name</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Capacity</TableHead>
+                        <TableHead>Price/Night</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {rooms.map((r) => (
+                        <TableRow key={r.id}>
+                          <TableCell className="font-medium">{r.name}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className="capitalize">{r.type}</Badge>
+                          </TableCell>
+                          <TableCell>{r.capacity} guests</TableCell>
+                          <TableCell>
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={r.is_available ? 'default' : 'destructive'}>
+                              {r.is_available ? 'Available' : 'Unavailable'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Button size="sm" variant="outline" onClick={() => toggleRoomAvailability(r.id, r.is_available)}>
+                              {r.is_available ? 'Disable' : 'Enable'}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
