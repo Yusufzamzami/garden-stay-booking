@@ -28,7 +28,11 @@ const Rooms = () => {
 
   const fetchRooms = async () => {
     try {
-      let query = supabase.from('rooms').select('*').eq('is_available', true);
+      let query = supabase
+        .from('rooms')
+        .select('*')
+        .eq('is_available', true)
+        .in('type', ['standard', 'deluxe']);
 
       if (roomType && roomType !== 'any') {
         query = query.eq('type', roomType);

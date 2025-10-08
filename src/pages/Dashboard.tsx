@@ -49,11 +49,7 @@ const Dashboard = () => {
       const totalBookings = bookingsData?.length || 0;
       const totalRevenue =
         bookingsData?.reduce(
-          (sum, booking) =>
-            sum +
-            (booking.payment_status === 'completed'
-              ? parseFloat(booking.total_price.toString())
-              : 0),
+          (sum, booking) => sum + parseFloat(booking.total_price.toString()),
           0
         ) || 0;
 

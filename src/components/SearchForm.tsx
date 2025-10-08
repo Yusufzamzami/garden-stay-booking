@@ -42,11 +42,11 @@ return (
               <div className="space-y-2">
                 <Label htmlFor="checkin" className="flex items-center gap-2 text-foreground font-medium">
                   <Calendar className="h-4 w-4 text-primary" />
-                  Tanggal Check-in
+                  Tanggal & Jam Check-in
                 </Label>
                 <Input
                   id="checkin"
-                  type="date"
+                  type="datetime-local"
                   value={searchData.checkIn}
                   onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
                   className="border-primary/20 focus:border-primary"
@@ -56,11 +56,11 @@ return (
               <div className="space-y-2">
                 <Label htmlFor="checkout" className="flex items-center gap-2 text-foreground font-medium">
                   <Calendar className="h-4 w-4 text-primary" />
-                  Tanggal Check-out
+                  Tanggal & Jam Check-out
                 </Label>
                 <Input
                   id="checkout"
-                  type="date"
+                  type="datetime-local"
                   value={searchData.checkOut}
                   onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
                   className="border-primary/20 focus:border-primary"
@@ -98,8 +98,6 @@ return (
                   <SelectContent>
                     <SelectItem value="standard">Standard Room</SelectItem>
                     <SelectItem value="deluxe">Deluxe Room</SelectItem>
-                    <SelectItem value="suite">Garden Suite</SelectItem>
-                    <SelectItem value="presidential">Presidential Suite</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
