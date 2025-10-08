@@ -119,20 +119,22 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                 <Label htmlFor="cash" className="font-normal cursor-pointer">Cash</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="iris_bca" id="iris_bca" />
-                <Label htmlFor="iris_bca" className="font-normal cursor-pointer">IRIS - BCA</Label>
+                <RadioGroupItem value="bca" id="bca" />
+                <Label htmlFor="bca" className="font-normal cursor-pointer">BCA</Label>
               </div>
             </RadioGroup>
 
-            {paymentMethod === 'iris_bca' && (
+            {paymentMethod === 'bca' && (
               <div className="mt-3 p-4 bg-muted rounded-lg space-y-2">
                 <p className="font-semibold">Transfer ke rekening BCA:</p>
                 <div className="space-y-1">
-                  <p className="text-sm">Nomor Rekening: <span className="font-mono font-bold">1234567890</span></p>
-                  <p className="text-sm">Atas Nama: <span className="font-semibold">Hotel Management</span></p>
+                  <p className="text-sm">Nomor Rekening: <span className="font-mono font-bold">5380087580</span></p>
+                  <p className="text-sm">Atas Nama: <span className="font-semibold">Sumitro</span></p>
                   <p className="text-sm text-muted-foreground">Silakan transfer sejumlah {new Intl.NumberFormat('id-ID', {
                     style: 'currency',
-                    currency: 'IDR'
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
                   }).format(room?.price_per_night ? room.price_per_night * guests : 0)}</p>
                 </div>
               </div>

@@ -46,8 +46,8 @@ const formatPrice = (price: number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(price);
 };
 
