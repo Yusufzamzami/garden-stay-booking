@@ -49,8 +49,8 @@ const Footer = () => {
                   <MapPin className="h-5 w-5 text-gold mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-primary-foreground/90">
-                      Jl. Garden Paradise No. 123<br />
-                      Menteng, Jakarta Pusat 10310<br />
+                      Jl. Pinang Raya No.88, RT.3/RW.1, Pd. Labu, Kec. Cilandak, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12450<br />
+                      <br />
                       Indonesia
                     </p>
                   </div>
