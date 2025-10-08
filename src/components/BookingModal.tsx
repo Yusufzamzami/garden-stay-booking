@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,12 +32,33 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
   const [guestEmail, setGuestEmail] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  // Set default price when room changes
+  useState(() => {
+    if (room) {
+      setTotalPrice(room.price_per_night * guests);
+    }
+  });
+
+
+  // Update price when room or guests change
+  useEffect(() => {
+    if (room) {
+      setTotalPrice(room.price_per_night * guests);
+    }
+  }, [room, guests]);
 
   const handleBooking = async () => {
     if (!room) return;
 
     if (!guestName || !guestEmail || !guestPhone) {
-      toast.error('Please fill in all fields.');
+      toast.error('Mohon lengkapi semua field.');
+      return;
+    }
+
+    if (totalPrice <= 0) {
+      toast.error('Harga total harus lebih dari 0.');
       return;
     }
 
@@ -51,7 +72,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
         check_in_date: checkIn,
         check_out_date: checkOut,
         guests_count: guests,
-        total_price: room.price_per_night * guests,
+        total_price: totalPrice,
         booking_status: 'confirmed',
         payment_status: 'pending',
         payment_method: paymentMethod,
@@ -60,11 +81,16 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
 
       if (error) throw error;
 
-      toast.success('Booking successful!');
+      toast.success('Booking berhasil!');
+      // Reset form
+      setGuestName('');
+      setGuestEmail('');
+      setGuestPhone('');
+      setPaymentMethod('cash');
       onClose();
     } catch (err) {
       console.error(err);
-      toast.error('Booking failed.');
+      toast.error('Booking gagal.');
     } finally {
       setLoading(false);
     }
@@ -111,6 +137,33 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="totalPrice">Total Harga</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                Rp
+              </span>
+              <Input
+                id="totalPrice"
+                type="number"
+                placeholder="Masukkan total harga"
+                value={totalPrice}
+                onChange={(e) => setTotalPrice(parseFloat(e.target.value) || 0)}
+                className="pl-10"
+                min="0"
+                step="1000"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Harga default: {new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+              }).format(room?.price_per_night ? room.price_per_night * guests : 0)}
+            </p>
+          </div>
+
           <div className="space-y-3">
             <Label>Metode Pembayaran</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -135,7 +188,7 @@ const BookingModal = ({ isOpen, onClose, room, checkIn, checkOut, guests }: Book
                     currency: 'IDR',
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0
-                  }).format(room?.price_per_night ? room.price_per_night * guests : 0)}</p>
+                  }).format(totalPrice)}</p>
                 </div>
               </div>
             )}
