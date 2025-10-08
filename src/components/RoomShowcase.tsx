@@ -10,51 +10,35 @@ import gardenView from "@/assets/garden-view.jpg";
 const rooms = [
   {
     id: 1,
-    name: "Deluxe Garden Room",
+    name: "Standard Room",
     image: deluxeRoom,
-    price: 250.000,
+    price: 210000,
     capacity: 2,
-    size: "10 m²",
+    size: "25 m²",
+    features: ["Queen Bed", "City View", "Free WiFi", "AC"],
+    amenities: [
+      { icon: Bed, label: "Queen Bed" },
+      { icon: Wifi, label: "Free WiFi" },
+      { icon: Coffee, label: "Coffee Maker" },
+      { icon: Bath, label: "Private Bath" }
+    ],
+    description: "Kamar nyaman dengan fasilitas standar untuk kenyamanan Anda."
+  },
+  {
+    id: 2,
+    name: "Deluxe Room",
+    image: suiteRoom,
+    price: 235000,
+    capacity: 2,
+    size: "35 m²",
     features: ["King Bed", "Garden View", "Free WiFi", "Mini Bar"],
     amenities: [
       { icon: Bed, label: "King Bed" },
       { icon: Wifi, label: "Free WiFi" },
       { icon: Coffee, label: "Mini Bar" },
-      { icon: Bath, label: "Private Bath" }
+      { icon: Bath, label: "Luxury Bath" }
     ],
-    description: "Kamar elegan dengan pemandangan taman yang menakjubkan dan fasilitas modern."
-  },
-  {
-    id: 2,
-    name: "Garden Suite",
-    image: suiteRoom,
-    price: 300.000,
-    capacity: 4,
-    size: "15 m²",
-    features: ["Living Area", "Balcony", "Garden View", "Premium Amenities"],
-    amenities: [
-      { icon: Bed, label: "King Bed" },
-      { icon: Users, label: "Living Area" },
-      { icon: Car, label: "Valet Parking" },
-      { icon: Coffee, label: "Premium Bar" }
-    ],
-    description: "Suite yang luas dengan ruang tamu terpisah dan balkon pribadi."
-  },
-  {
-    id: 3,
-    name: "Presidential Suite",
-    image: gardenView,
-    price: 350.000,
-    capacity: 3,
-    size: "20 m²",
-    features: ["2 Bedrooms", "Panoramic Views", "Butler Service", "Private Terrace"],
-    amenities: [
-      { icon: Bed, label: "2 Bedrooms" },
-      { icon: Users, label: "Butler Service" },
-      { icon: Car, label: "Private Parking" },
-      { icon: Coffee, label: "Premium Lounge" }
-    ],
-    description: "Kemewahan terbaik dengan pemandangan taman yang indah dan layanan yang dipersonalisasi.."
+    description: "Kamar mewah dengan pemandangan taman dan fasilitas premium."
   }
 ];
 
@@ -81,7 +65,7 @@ const RoomShowcase = memo(() => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {rooms.map((room) => (
             <Card key={room.id} className="group overflow-hidden shadow-elegant hover:shadow-xl transition-all duration-500 bg-gradient-card">
               <div className="relative overflow-hidden">
