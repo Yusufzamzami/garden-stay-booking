@@ -99,40 +99,88 @@ const Dashboard = () => {
   const exportFinancialReportCSV = () => {
     try {
       const headers = [
+        'No',
         'Tanggal Booking',
         'Nama Tamu',
         'Email',
         'Telepon',
-        'Kamar',
+        'Tipe Kamar',
+        'Nama Kamar',
         'Check-in',
         'Check-out',
+        'Jumlah Malam',
         'Jumlah Tamu',
-        'Total Harga (IDR)',
+        'Harga per Malam',
+        'Total Harga',
+        'Metode Pembayaran',
         'Status Pembayaran',
         'Status Booking',
+        'Permintaan Khusus'
       ];
 
-      const rows = bookings.map((b) => [
-        new Date(b.created_at).toLocaleDateString('id-ID'),
-        b.guest_name,
-        b.guest_email,
-        b.guest_phone,
-        b.rooms?.name || '-',
-        new Date(b.check_in_date).toLocaleDateString('id-ID'),
-        new Date(b.check_out_date).toLocaleDateString('id-ID'),
-        b.guests_count,
-        new Intl.NumberFormat('id-ID').format(b.total_price),
-        b.payment_status,
-        b.booking_status,
-      ]);
+      const rows = bookings.map((b, index) => {
+        const checkIn = new Date(b.check_in_date);
+        const checkOut = new Date(b.check_out_date);
+        const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+        const pricePerNight = parseFloat(b.total_price.toString()) / nights;
 
-      const csvContent = [headers.join(','), ...rows.map((r) => r.map((c) => `"${c}"`).join(','))].join('\n');
+        return [
+          (index + 1).toString(),
+          new Date(b.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          b.guest_name,
+          b.guest_email,
+          b.guest_phone,
+          b.rooms?.type || '-',
+          b.rooms?.name || '-',
+          checkIn.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          checkOut.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          nights.toString(),
+          b.guests_count.toString(),
+          `Rp ${new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(pricePerNight)}`,
+          `Rp ${new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(b.total_price)}`,
+          b.payment_method || '-',
+          b.payment_status === 'pending' ? 'Pending' : b.payment_status === 'paid' ? 'Lunas' : 'Dibatalkan',
+          b.booking_status === 'confirmed' ? 'Dikonfirmasi' : 'Dibatalkan',
+          b.special_requests || '-'
+        ];
+      });
+
+      // Add summary row
+      const totalRevenue = bookings.reduce((sum, b) => sum + parseFloat(b.total_price.toString()), 0);
+      const summaryRow = [
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        'TOTAL:',
+        '',
+        `Rp ${new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(totalRevenue)}`,
+        '',
+        '',
+        '',
+        ''
+      ];
+
+      const csvContent = [
+        headers.join(','),
+        ...rows.map((r) => r.map((c) => `"${c}"`).join(',')),
+        '',
+        summaryRow.map((c) => `"${c}"`).join(',')
+      ].join('\n');
+
       const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.href = url;
-      link.download = `Laporan_Keuangan_${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = `Laporan_Keuangan_${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}.csv`;
       link.click();
+      URL.revokeObjectURL(url);
       toast.success('Laporan CSV berhasil diexport!');
     } catch (error) {
       console.error('Error exporting CSV report:', error);
@@ -467,47 +515,97 @@ const Dashboard = () => {
           <TabsContent value="rooms">
             <Card>
               <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-lg sm:text-xl">Room Management</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">Kelola ketersediaan dan harga kamar</CardDescription>
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                  <div>
+                    <CardTitle className="text-lg sm:text-xl">Available Rooms</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm mt-1">
+                      Kelola ketersediaan dan harga kamar hotel
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Badge variant="default" className="gap-1">
+                      <Bed className="h-3 w-3" />
+                      {stats.availableRooms} Tersedia
+                    </Badge>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="p-0 sm:p-6">
                 {/* Mobile Card View */}
-                <div className="sm:hidden space-y-3 p-4">
+                <div className="sm:hidden space-y-4 p-4">
                   {rooms.map((r) => (
-                    <Card key={r.id} className="p-4 hover-scale">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="font-semibold">{r.name}</div>
-                            <Badge variant="secondary" className="capitalize text-xs mt-1">
-                              {r.type}
+                    <Card key={r.id} className="overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
+                      <div className="p-4 space-y-4">
+                        {/* Header */}
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-bold text-base mb-1">{r.name}</h3>
+                            <Badge variant="secondary" className="capitalize text-xs">
+                              {r.type === 'deluxe' ? 'Deluxe Room' : r.type === 'standard' ? 'Standard Room' : r.type}
                             </Badge>
                           </div>
-                          <Badge variant={r.is_available ? 'default' : 'destructive'} className="text-xs">
-                            {r.is_available ? 'Available' : 'Unavailable'}
+                          <Badge 
+                            variant={r.is_available ? 'default' : 'destructive'} 
+                            className="text-xs font-semibold shrink-0"
+                          >
+                            {r.is_available ? 'Tersedia' : 'Penuh'}
                           </Badge>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-muted-foreground">Kapasitas:</span>
-                            <div className="font-medium">{r.capacity} tamu</div>
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                              <Users className="h-3.5 w-3.5" />
+                              <span>Kapasitas</span>
+                            </div>
+                            <div className="font-semibold text-sm">{r.capacity} Tamu</div>
                           </div>
-                          <div>
-                            <span className="text-muted-foreground">Harga/Malam:</span>
-                            <div className="font-bold text-primary">
-                              {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                              <DollarSign className="h-3.5 w-3.5" />
+                              <span>Harga/Malam</span>
+                            </div>
+                            <div className="font-bold text-primary text-sm">
+                              Rp {new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(r.price_per_night)}
                             </div>
                           </div>
                         </div>
+
+                        {/* Description */}
+                        {r.description && (
+                          <p className="text-xs text-muted-foreground line-clamp-2 px-1">
+                            {r.description}
+                          </p>
+                        )}
+
+                        {/* Amenities */}
+                        {r.amenities && r.amenities.length > 0 && (
+                          <div className="px-1">
+                            <div className="text-xs font-medium text-muted-foreground mb-2">Fasilitas:</div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {r.amenities.slice(0, 4).map((amenity, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs py-0.5 px-2">
+                                  {amenity}
+                                </Badge>
+                              ))}
+                              {r.amenities.length > 4 && (
+                                <Badge variant="outline" className="text-xs py-0.5 px-2">
+                                  +{r.amenities.length - 4} lainnya
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )}
                         
+                        {/* Action Button */}
                         <Button 
                           size="sm" 
-                          variant="outline" 
+                          variant={r.is_available ? "outline" : "default"}
                           onClick={() => toggleRoomAvailability(r.id, r.is_available)}
-                          className="w-full text-xs"
+                          className="w-full font-semibold"
                         >
-                          {r.is_available ? 'Nonaktifkan' : 'Aktifkan'}
+                          {r.is_available ? '🔒 Nonaktifkan Kamar' : '✓ Aktifkan Kamar'}
                         </Button>
                       </div>
                     </Card>
@@ -518,34 +616,68 @@ const Dashboard = () => {
                 <div className="hidden sm:block overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Room Name</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Capacity</TableHead>
-                        <TableHead>Price/Night</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="font-bold">Nama Kamar</TableHead>
+                        <TableHead className="font-bold">Tipe</TableHead>
+                        <TableHead className="font-bold">Kapasitas</TableHead>
+                        <TableHead className="font-bold">Harga/Malam</TableHead>
+                        <TableHead className="font-bold">Fasilitas</TableHead>
+                        <TableHead className="font-bold">Status</TableHead>
+                        <TableHead className="font-bold text-center">Aksi</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {rooms.map((r) => (
-                        <TableRow key={r.id}>
-                          <TableCell className="font-medium">{r.name}</TableCell>
+                        <TableRow key={r.id} className="hover:bg-muted/30 transition-colors">
+                          <TableCell className="font-semibold">{r.name}</TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="capitalize">{r.type}</Badge>
-                          </TableCell>
-                          <TableCell>{r.capacity} guests</TableCell>
-                          <TableCell>
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(r.price_per_night)}
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={r.is_available ? 'default' : 'destructive'}>
-                              {r.is_available ? 'Available' : 'Unavailable'}
+                            <Badge variant="secondary" className="capitalize font-medium">
+                              {r.type === 'deluxe' ? 'Deluxe Room' : r.type === 'standard' ? 'Standard Room' : r.type}
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            <Button size="sm" variant="outline" onClick={() => toggleRoomAvailability(r.id, r.is_available)}>
-                              {r.is_available ? 'Disable' : 'Enable'}
+                            <div className="flex items-center gap-1.5">
+                              <Users className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium">{r.capacity} Tamu</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-bold text-primary">
+                            Rp {new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(r.price_per_night)}
+                          </TableCell>
+                          <TableCell>
+                            {r.amenities && r.amenities.length > 0 ? (
+                              <div className="flex flex-wrap gap-1 max-w-xs">
+                                {r.amenities.slice(0, 3).map((amenity, idx) => (
+                                  <Badge key={idx} variant="outline" className="text-xs">
+                                    {amenity}
+                                  </Badge>
+                                ))}
+                                {r.amenities.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{r.amenities.length - 3}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={r.is_available ? 'default' : 'destructive'}
+                              className="font-semibold"
+                            >
+                              {r.is_available ? 'Tersedia' : 'Penuh'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button 
+                              size="sm" 
+                              variant={r.is_available ? "outline" : "default"}
+                              onClick={() => toggleRoomAvailability(r.id, r.is_available)}
+                              className="font-medium"
+                            >
+                              {r.is_available ? 'Nonaktifkan' : 'Aktifkan'}
                             </Button>
                           </TableCell>
                         </TableRow>
