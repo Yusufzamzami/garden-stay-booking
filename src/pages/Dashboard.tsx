@@ -6,7 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, DollarSign, Users, Bed, ArrowLeft, Download, FileText } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar, DollarSign, Users, Bed, ArrowLeft, Download, FileText, Pencil, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -24,6 +28,16 @@ const Dashboard = () => {
     availableRooms: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [editingRoom, setEditingRoom] = useState<any>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    type: '',
+    description: '',
+    price_per_night: 0,
+    capacity: 0,
+    amenities: '',
+  });
 
   useEffect(() => {
     if (user) fetchDashboardData();
@@ -80,9 +94,69 @@ const Dashboard = () => {
     try {
       const { error } = await supabase.from('rooms').update({ is_available: !isAvailable }).eq('id', roomId);
       if (error) throw error;
+      toast.success(`Status kamar berhasil ${!isAvailable ? 'diaktifkan' : 'dinonaktifkan'}`);
       fetchDashboardData();
     } catch (error) {
       console.error('Error updating room availability:', error);
+      toast.error('Gagal mengubah status kamar');
+    }
+  };
+
+  const openEditDialog = (room: any) => {
+    setEditingRoom(room);
+    setEditForm({
+      name: room.name,
+      type: room.type,
+      description: room.description || '',
+      price_per_night: room.price_per_night,
+      capacity: room.capacity,
+      amenities: room.amenities?.join(', ') || '',
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const closeEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setEditingRoom(null);
+    setEditForm({
+      name: '',
+      type: '',
+      description: '',
+      price_per_night: 0,
+      capacity: 0,
+      amenities: '',
+    });
+  };
+
+  const saveRoomChanges = async () => {
+    if (!editingRoom) return;
+    
+    try {
+      const amenitiesArray = editForm.amenities
+        .split(',')
+        .map(a => a.trim())
+        .filter(a => a.length > 0);
+
+      const { error } = await supabase
+        .from('rooms')
+        .update({
+          name: editForm.name,
+          type: editForm.type,
+          description: editForm.description,
+          price_per_night: editForm.price_per_night,
+          capacity: editForm.capacity,
+          amenities: amenitiesArray,
+        })
+        .eq('id', editingRoom.id);
+
+      if (error) throw error;
+      
+      toast.success('Data kamar berhasil diperbarui!');
+      closeEditDialog();
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error updating room:', error);
+      toast.error('Gagal memperbarui data kamar');
     }
   };
 
@@ -90,9 +164,11 @@ const Dashboard = () => {
     try {
       const { error } = await supabase.from('bookings').delete().eq('id', bookingId);
       if (error) throw error;
+      toast.success('Booking berhasil dihapus');
       fetchDashboardData();
     } catch (error) {
       console.error('Error deleting booking:', error);
+      toast.error('Gagal menghapus booking');
     }
   };
 
@@ -598,15 +674,26 @@ const Dashboard = () => {
                           </div>
                         )}
                         
-                        {/* Action Button */}
-                        <Button 
-                          size="sm" 
-                          variant={r.is_available ? "outline" : "default"}
-                          onClick={() => toggleRoomAvailability(r.id, r.is_available)}
-                          className="w-full font-semibold"
-                        >
-                          {r.is_available ? '🔒 Nonaktifkan Kamar' : '✓ Aktifkan Kamar'}
-                        </Button>
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => openEditDialog(r)}
+                            className="font-semibold gap-1.5"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            Edit
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant={r.is_available ? "outline" : "default"}
+                            onClick={() => toggleRoomAvailability(r.id, r.is_available)}
+                            className="font-semibold"
+                          >
+                            {r.is_available ? '🔒 Nonaktifkan' : '✓ Aktifkan'}
+                          </Button>
+                        </div>
                       </div>
                     </Card>
                   ))}
@@ -671,14 +758,23 @@ const Dashboard = () => {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-center">
-                            <Button 
-                              size="sm" 
-                              variant={r.is_available ? "outline" : "default"}
-                              onClick={() => toggleRoomAvailability(r.id, r.is_available)}
-                              className="font-medium"
-                            >
-                              {r.is_available ? 'Nonaktifkan' : 'Aktifkan'}
-                            </Button>
+                            <div className="flex gap-2 justify-center">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => openEditDialog(r)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant={r.is_available ? "outline" : "default"}
+                                onClick={() => toggleRoomAvailability(r.id, r.is_available)}
+                                className="font-medium"
+                              >
+                                {r.is_available ? 'Nonaktifkan' : 'Aktifkan'}
+                              </Button>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -689,6 +785,101 @@ const Dashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Edit Room Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Room Data</DialogTitle>
+              <DialogDescription>
+                Ubah informasi kamar sesuai kebutuhan. Klik simpan untuk menyimpan perubahan.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nama Kamar</Label>
+                <Input
+                  id="name"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder="Contoh: Deluxe Garden View"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="type">Tipe Kamar</Label>
+                <select
+                  id="type"
+                  value={editForm.type}
+                  onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="standard">Standard Room</option>
+                  <option value="deluxe">Deluxe Room</option>
+                  <option value="suite">Suite Room</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="capacity">Kapasitas (Tamu)</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    min="1"
+                    value={editForm.capacity}
+                    onChange={(e) => setEditForm({ ...editForm, capacity: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Harga per Malam (Rp)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={editForm.price_per_night}
+                    onChange={(e) => setEditForm({ ...editForm, price_per_night: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="description">Deskripsi</Label>
+                <Textarea
+                  id="description"
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  placeholder="Deskripsi kamar..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="amenities">Fasilitas</Label>
+                <Textarea
+                  id="amenities"
+                  value={editForm.amenities}
+                  onChange={(e) => setEditForm({ ...editForm, amenities: e.target.value })}
+                  placeholder="WiFi, AC, TV, Kamar Mandi Dalam, dll (pisahkan dengan koma)"
+                  rows={2}
+                />
+                <p className="text-xs text-muted-foreground">Pisahkan setiap fasilitas dengan koma (,)</p>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={closeEditDialog}>
+                Batal
+              </Button>
+              <Button onClick={saveRoomChanges}>
+                Simpan Perubahan
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
